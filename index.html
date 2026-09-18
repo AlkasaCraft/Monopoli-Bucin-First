@@ -24,7 +24,7 @@
         }
     </style>
 </head>
-<body class="bg-red-50 text-gray-800 font-sans min-h-screen flex flex-col items-center justify-between p-4">
+<body class="bg-red-50 text-gray-800 font-sans min-h-screen flex flex-col items-center justify-between p-4 relative">
 
     <!-- SETUP SCREEN -->
     <div id="setup-screen" class="w-full max-w-md bg-white monopoly-border rounded-2xl p-6 shadow-xl my-auto">
@@ -78,31 +78,28 @@
             </div>
         </div>
 
-        <!-- Area Kartu & Dadu -->
-        <div class="grid grid-cols-2 gap-3">
-            <!-- Kartu Panel -->
-            <div class="bg-white monopoly-border rounded-2xl p-3 flex flex-col justify-between shadow-md text-center">
-                <h4 class="font-bold text-xs text-red-900 mb-2">Kartu Misteri</h4>
-                <div id="card-display" class="bg-red-50 p-2 rounded-lg text-xs text-red-800 min-h-[50px] flex items-center justify-center font-medium mb-2 border border-dashed border-red-300">
-                    Tekan tombol untuk ambil kartu!
-                </div>
-                <div class="grid grid-cols-2 gap-1">
-                    <button onclick="drawCard('chance')" class="bg-yellow-500 hover:bg-yellow-600 text-white text-[10px] font-bold py-1 px-1 rounded shadow">Kesempatan</button>
-                    <button onclick="drawCard('challenge')" class="bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold py-1 px-1 rounded shadow">Tantangan</button>
-                </div>
+        <!-- Dadu Panel -->
+        <div class="bg-white monopoly-border rounded-2xl p-4 flex flex-col justify-between shadow-md text-center">
+            <h4 class="font-bold text-xs text-red-900 mb-1">Lempar Dadu</h4>
+            <div class="my-auto py-2">
+                <div id="dice-box" class="text-4xl font-black text-red-800 mb-1">🎲 <span id="dice-icon">⚀</span></div>
+                <p id="dice-value" class="text-xs text-gray-600">Angka: -</p>
             </div>
-
-            <!-- Dadu Panel -->
-            <div class="bg-white monopoly-border rounded-2xl p-3 flex flex-col justify-between shadow-md text-center">
-                <h4 class="font-bold text-xs text-red-900 mb-1">Lempar Dadu</h4>
-                <div class="my-auto">
-                    <div id="dice-box" class="text-4xl font-black text-red-800 mb-1">🎲 <span id="dice-icon">⚀</span></div>
-                    <p id="dice-value" class="text-xs text-gray-600">Angka: -</p>
-                </div>
-                <button id="roll-btn" onclick="rollDice()" class="w-full monopoly-red text-white text-xs font-bold py-2 rounded-xl shadow hover:bg-red-800 transition">Lempar Dadu</button>
-            </div>
+            <button id="roll-btn" onclick="rollDice()" class="w-full monopoly-red text-white text-xs font-bold py-3 rounded-xl shadow hover:bg-red-800 transition">Lempar Dadu</button>
         </div>
 
+    </div>
+
+    <!-- POP-UP MODAL INFORMASI / KARTU -->
+    <div id="card-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl monopoly-border p-6 max-w-sm w-full text-center shadow-2xl space-y-4">
+            <div id="modal-icon" class="text-4xl">🌟</div>
+            <h3 id="modal-title" class="text-xl font-black text-red-900">INFORMASI</h3>
+            <div id="modal-content" class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300">
+                Isi informasi akan muncul di sini...
+            </div>
+            <button onclick="closeCardModal()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition">Sudah Selesai ✨</button>
+        </div>
     </div>
 
     <script>
@@ -207,8 +204,8 @@
             
             let desc = "";
             if(currentTile.type === 'start') desc = "Titik awal permainan.";
-            else if(currentTile.type === 'chance') desc = "Kotak Kesempatan! Ambil kartu kesempatan di bawah.";
-            else if(currentTile.type === 'challenge') desc = "Kotak Tantangan! Ambil kartu tantangan di bawah.";
+            else if(currentTile.type === 'chance') desc = "Kotak Kesempatan! Kartu acak akan terbuka.";
+            else if(currentTile.type === 'challenge') desc = "Kotak Tantangan! Kartu acak akan terbuka.";
             else if(currentTile.type === 'jail') {
                 if (player.inJail) {
                     desc = "🚨 Kamu sedang berada di PENJARA! Pilih metode untuk bebas.";
@@ -286,19 +283,56 @@
                 if (newPos >= tiles.length) {
                     newPos = newPos % tiles.length;
                     player.money += 2000000;
-                    alert(`🎉 Yeay! ${player.name} melewati/mencapai garis START dan mendapatkan bonus Rp 2.000.000 dari Bank Central!`);
+                    showPopup("🎉 BONUS START!", `Yeay! ${player.name} melewati/mencapai garis START dan mendapatkan bonus Rp 2.000.000 dari Bank Central! 💰`, "💰");
                 }
 
                 player.position = newPos;
                 hasRolled = true;
 
-                if (tiles[player.position].type === 'jail') {
+                let currentTile = tiles[player.position];
+
+                if (currentTile.type === 'jail') {
                     player.inJail = true;
-                    alert(`🚨 Oh tidak! ${player.name} masuk ke kotak Penjara!`);
+                    showPopup("🚨 PENJARA!", `Oh tidak! ${player.name} masuk ke kotak Penjara!`, "🚨");
+                } else if (currentTile.type === 'chance' || currentTile.type === 'challenge') {
+                    triggerCardPopup();
                 }
 
                 updateUI();
             });
+        }
+
+        function showPopup(title, message, icon) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('modal-content').innerText = message;
+            document.getElementById('card-modal').classList.remove('hidden');
+        }
+
+        function triggerCardPopup() {
+            let currentTile = tiles[players[currentTurn].position];
+            let cardText = "";
+            let modalTitle = document.getElementById('modal-title');
+            let modalIcon = document.getElementById('modal-icon');
+
+            if(currentTile.type === 'chance') {
+                let rand = Math.floor(Math.random() * chanceCards.length);
+                cardText = chanceCards[rand];
+                modalTitle.innerText = "🌟 KARTU KESEMPATAN";
+                modalIcon.innerText = "🌟";
+            } else if(currentTile.type === 'challenge') {
+                let rand = Math.floor(Math.random() * challengeCards.length);
+                cardText = challengeCards[rand];
+                modalTitle.innerText = "🔥 KARTU TANTANGAN";
+                modalIcon.innerText = "🔥";
+            }
+
+            document.getElementById('modal-content').innerText = `${players[currentTurn].name}, jalankan perintah ini:\n\n"${cardText}"`;
+            document.getElementById('card-modal').classList.remove('hidden');
+        }
+
+        function closeCardModal() {
+            document.getElementById('card-modal').classList.add('hidden');
         }
 
         function jailRollDice() {
@@ -306,10 +340,10 @@
                 let player = players[currentTurn];
                 if (diceRoll === 6) {
                     player.inJail = false;
-                    alert(`🎉 Hore! ${player.name} mendapatkan angka 6 dan berhasil keluar dari penjara!`);
+                    showPopup("🎉 BEBAS!", `Hore! ${player.name} mendapatkan angka 6 dan berhasil keluar dari penjara!`, "🎉");
                     updateUI();
                 } else {
-                    alert(`❌ Yah, dadu menunjukkan angka ${diceRoll}. Kamu belum berhasil keluar dari penjara.`);
+                    showPopup("❌ BELUM BERHASIL", `Yah, dadu menunjukkan angka ${diceRoll}. Kamu belum berhasil keluar dari penjara.`, "❌");
                     nextTurn();
                 }
             });
@@ -321,10 +355,10 @@
             if (player.money >= fine) {
                 player.money -= fine;
                 player.inJail = false;
-                alert(`${player.name} membayar denda Rp 5.000.000 dan bebas dari penjara! 💸`);
+                showPopup("💸 BEBAS DENDA", `${player.name} membayar denda Rp 5.000.000 dan bebas dari penjara!`, "💸");
                 updateUI();
             } else {
-                alert("Uang kamu tidak cukup untuk membayar denda penjara!");
+                showPopup("⚠️ SALDO KURANG", "Uang kamu tidak cukup untuk membayar denda penjara!", "⚠️");
             }
         }
 
@@ -332,7 +366,7 @@
             let player = players[currentTurn];
             let rand = Math.floor(Math.random() * challengeCards.length);
             player.inJail = false;
-            alert(`${player.name} memilih tantangan untuk bebas:\n\n🔥 "${challengeCards[rand]}"\n\nSelamat, kamu bebas dari penjara! ✨`);
+            showPopup("✨ BEBAS DENGAN TANTANGAN", `${player.name} memilih tantangan untuk bebas:\n\n🔥 "${challengeCards[rand]}"\n\nSelamat, kamu bebas dari penjara!`, "✨");
             updateUI();
         }
 
@@ -371,10 +405,10 @@
                 tile.owner = currentTurn;
                 tile.buyoutCount = 0;
                 player.properties.push(tile.name);
-                alert(`Yeay! ${player.name} berhasil membeli ${tile.name}! 🎉`);
+                showPopup("🎉 PEMBELIAN BERHASIL", `Yeay! ${player.name} berhasil membeli ${tile.name}!`, "🎉");
                 nextTurn();
             } else {
-                alert("Duh, uang kamu tidak cukup untuk membeli aset ini, sayang!");
+                showPopup("⚠️ SALDO KURANG", "Duh, uang kamu tidak cukup untuk membeli aset ini, sayang!", "⚠️");
             }
         }
 
@@ -387,10 +421,10 @@
             if (player.money >= taxAmount) {
                 player.money -= taxAmount;
                 owner.money += taxAmount;
-                alert(`${player.name} membayar pajak masuk sebesar Rp ${taxAmount.toLocaleString()} (10% dari harga ${tile.name}) kepada ${owner.name}. 💸`);
+                showPopup("💸 BAYAR PAJAK", `${player.name} membayar pajak masuk sebesar Rp ${taxAmount.toLocaleString()} (10% dari harga ${tile.name}) kepada ${owner.name}.`, "💸");
                 nextTurn();
             } else {
-                alert("Uang kamu tidak cukup untuk membayar pajak masuk kota ini!");
+                showPopup("⚠️ SALDO KURANG", "Uang kamu tidak cukup untuk membayar pajak masuk kota ini!", "⚠️");
             }
         }
 
@@ -410,30 +444,17 @@
                 tile.buyoutCount++;
                 player.properties.push(tile.name);
 
-                alert(`Hebat! ${player.name} berhasil melakukan buyout ${tile.name} seharga Rp ${buyoutPrice.toLocaleString()} dari ${prevOwner.name}! 🏢✨`);
+                showPopup("🏢 BUYOUT BERHASIL", `Hebat! ${player.name} berhasil melakukan buyout ${tile.name} seharga Rp ${buyoutPrice.toLocaleString()} dari ${prevOwner.name}!`, "🏢");
                 nextTurn();
             } else {
-                alert("Duh, uang kamu kurang untuk melakukan pembelian alih (buyout) aset ini!");
+                showPopup("⚠️ SALDO KURANG", "Duh, uang kamu kurang untuk melakukan pembelian alih (buyout) aset ini!", "⚠️");
             }
-        }
-
-        function drawCard(type) {
-            let cardText = "";
-            if(type === 'chance') {
-                let rand = Math.floor(Math.random() * chanceCards.length);
-                cardText = "🌟 KESEMPATAN: " + chanceCards[rand];
-            } else {
-                let rand = Math.floor(Math.random() * challengeCards.length);
-                cardText = "🔥 TANTANGAN: " + challengeCards[rand];
-            }
-            document.getElementById('card-display').innerText = cardText;
         }
 
         function nextTurn() {
             currentTurn = currentTurn === 0 ? 1 : 0;
             hasRolled = false;
             
-            document.getElementById('card-display').innerText = "Tekan tombol untuk ambil kartu!";
             document.getElementById('dice-icon').innerText = "⚀";
             document.getElementById('dice-value').innerText = "Angka: -";
 
