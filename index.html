@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoli Bucin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .monopoly-red { background-color: #990000; }
+        .monopoly-dark-red { background-color: #660000; }
+        .monopoly-border { border: 3px solid #660000; }
+        
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(-10deg); }
+            40% { transform: translate(1px, -1px) rotate(10deg); }
+            60% { transform: translate(-1px, 2px) rotate(0deg); }
+            80% { transform: translate(-3px, 1px) rotate(-5deg); }
+            100% { transform: translate(1px, -2px) rotate(5deg); }
+        }
+        .dice-animating {
+            animation: shake 0.15s infinite;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-red-50 text-gray-800 font-sans min-h-screen flex flex-col items-center justify-between p-4">
+
+    <!-- SETUP SCREEN -->
+    <div id="setup-screen" class="w-full max-w-md bg-white monopoly-border rounded-2xl p-6 shadow-xl my-auto">
+        <h1 class="text-3xl font-extrabold text-center text-red-800 mb-2">🎲 Monopoli Bucin 💖</h1>
+        <p class="text-center text-sm text-gray-600 mb-6">Game Monopoli khusus buat kamu dan doi tersayang!</p>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-red-900 mb-1">Nama Pemain 1:</label>
+                <input type="text" id="player1-name" placeholder="Tulis Nama" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-red-900 mb-1">Nama Pemain 2:</label>
+                <input type="text" id="player2-name" placeholder="Tulis Nama" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
+            </div>
+            <button onclick="startGame()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition">Mulai Permainan 🚀</button>
+        </div>
+    </div>
+
+    <!-- GAMEPLAY SCREEN -->
+    <div id="game-screen" class="w-full max-w-md flex flex-col justify-between hidden space-y-4">
+        
+        <!-- Header / Info Pemain -->
+        <div class="bg-white monopoly-border rounded-2xl p-4 shadow-md">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-black text-red-900">Monopoli Bucin</h2>
+                <span id="turn-info" class="text-xs font-bold bg-red-100 text-red-800 px-3 py-1 rounded-full">Giliran: -</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-center">
+                <div id="p1-card" class="p-3 bg-red-50 rounded-xl border border-red-200">
+                    <p id="p1-display-name" class="font-bold text-sm text-red-900">P1</p>
+                    <p class="text-xs text-gray-600">Saldo: Rp <span id="p1-money">15000000</span></p>
+                    <p class="text-[10px] text-gray-500 mt-1">Aset: <span id="p1-properties">-</span></p>
+                </div>
+                <div id="p2-card" class="p-3 bg-white rounded-xl border border-gray-200">
+                    <p id="p2-display-name" class="font-bold text-sm text-gray-800">P2</p>
+                    <p class="text-xs text-gray-600">Saldo: Rp <span id="p2-money">15000000</span></p>
+                    <p class="text-[10px] text-gray-500 mt-1">Aset: <span id="p2-properties">-</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Status Kotak & Aksi -->
+        <div class="bg-white monopoly-border rounded-2xl p-4 shadow-md text-center">
+            <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Posisi Saat Ini</p>
+            <h3 id="current-tile-name" class="text-lg font-extrabold text-red-800 my-1">START</h3>
+            <p id="current-tile-desc" class="text-xs text-gray-600 mb-4">Selamat bermain! Lempar dadu untuk jalan.</p>
+            
+            <div id="action-buttons" class="space-y-2">
+                <!-- Tombol aksi dirender dinamis -->
+            </div>
+        </div>
+
+        <!-- Area Kartu & Dadu -->
+        <div class="grid grid-cols-2 gap-3">
+            <!-- Kartu Panel -->
+            <div class="bg-white monopoly-border rounded-2xl p-3 flex flex-col justify-between shadow-md text-center">
+                <h4 class="font-bold text-xs text-red-900 mb-2">Kartu Misteri</h4>
+                <div id="card-display" class="bg-red-50 p-2 rounded-lg text-xs text-red-800 min-h-[50px] flex items-center justify-center font-medium mb-2 border border-dashed border-red-300">
+                    Tekan tombol untuk ambil kartu!
+                </div>
+                <div class="grid grid-cols-2 gap-1">
+                    <button onclick="drawCard('chance')" class="bg-yellow-500 hover:bg-yellow-600 text-white text-[10px] font-bold py-1 px-1 rounded shadow">Kesempatan</button>
+                    <button onclick="drawCard('challenge')" class="bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold py-1 px-1 rounded shadow">Tantangan</button>
+                </div>
+            </div>
+
+            <!-- Dadu Panel -->
+            <div class="bg-white monopoly-border rounded-2xl p-3 flex flex-col justify-between shadow-md text-center">
+                <h4 class="font-bold text-xs text-red-900 mb-1">Lempar Dadu</h4>
+                <div class="my-auto">
+                    <div id="dice-box" class="text-4xl font-black text-red-800 mb-1">🎲 <span id="dice-icon">⚀</span></div>
+                    <p id="dice-value" class="text-xs text-gray-600">Angka: -</p>
+                </div>
+                <button id="roll-btn" onclick="rollDice()" class="w-full monopoly-red text-white text-xs font-bold py-2 rounded-xl shadow hover:bg-red-800 transition">Lempar Dadu</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const tiles = [
+            { name: "START", type: "start", price: 0, buyoutCount: 0 },
+            { name: "Jakarta", type: "property", price: 500000, owner: null, buyoutCount: 0 },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0 },
+            { name: "Bogor", type: "property", price: 800000, owner: null, buyoutCount: 0 },
+            { name: "Bandung", type: "property", price: 1200000, owner: null, buyoutCount: 0 },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0 },
+            { name: "Malang", type: "property", price: 1600000, owner: null, buyoutCount: 0 },
+            { name: "Stasiun", type: "property", price: 2500000, owner: null, buyoutCount: 0 }, 
+            { name: "Surabaya", type: "property", price: 2000000, owner: null, buyoutCount: 0 },
+            { name: "Jogjakarta", type: "property", price: 2400000, owner: null, buyoutCount: 0 },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0 },
+            { name: "Denpasar", type: "property", price: 3000000, owner: null, buyoutCount: 0 },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0 },
+            { name: "Lampung", type: "property", price: 3500000, owner: null, buyoutCount: 0 },
+            { name: "Penjara", type: "jail", buyoutCount: 0 }, 
+            { name: "Pekanbaru", type: "property", price: 4000000, owner: null, buyoutCount: 0 },
+            { name: "Medan", type: "property", price: 4600000, owner: null, buyoutCount: 0 },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0 },
+            { name: "Balikpapan", type: "property", price: 5300000, owner: null, buyoutCount: 0 },
+            { name: "Banjarmasin", type: "property", price: 6000000, owner: null, buyoutCount: 0 },
+            { name: "Bandara", type: "property", price: 7000000, owner: null, buyoutCount: 0 }, 
+            { name: "Samarinda", type: "property", price: 6800000, owner: null, buyoutCount: 0 },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0 },
+            { name: "Manado", type: "property", price: 7600000, owner: null, buyoutCount: 0 },
+            { name: "Makassar", type: "property", price: 8500000, owner: null, buyoutCount: 0 },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0 },
+            { name: "Jayapura", type: "property", price: 10000000, owner: null, buyoutCount: 0 }
+        ];
+
+        const chanceCards = [
+            "Tatap mata doi mu lalu bilang 'I Love You' dengan tulus.",
+            "Pegang tangan doi mu selama 3 giliran permainan berikutnya.",
+            "Puji 3 hal manis tentang doi mu sekarang juga!",
+            "Kirimkan sticker gombal paling lucu ke WhatsApp doi mu."
+        ];
+
+        const challengeCards = [
+            "Beliin 1 minuman favorit untuk doi mu!",
+            "Jilat saos dengan 1 jari di depan doi mu.",
+            "Buat story Instagram/WA dengan foto doi mu sekarang.",
+            "Pipi kamu dicubit gemes sama doi mu selama 5 detik."
+        ];
+
+        let players = [
+            { id: 0, name: "Pemain 1", money: 15000000, position: 0, properties: [], inJail: false },
+            { id: 1, name: "Pemain 2", money: 15000000, position: 0, properties: [], inJail: false }
+        ];
+        let currentTurn = 0; 
+        let hasRolled = false; 
+        const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+
+        function startGame() {
+            const p1Val = document.getElementById('player1-name').value.trim();
+            const p2Val = document.getElementById('player2-name').value.trim();
+
+            if(p1Val) players[0].name = p1Val;
+            if(p2Val) players[1].name = p2Val;
+
+            document.getElementById('p1-display-name').innerText = players[0].name;
+            document.getElementById('p2-display-name').innerText = players[1].name;
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            updateUI();
+        }
+
+        function getBuyoutPrice(tile) {
+            if (tile.buyoutCount === 0) {
+                return Math.round(tile.price * 1.5);
+            } else {
+                let baseBuyout = tile.price * 1.5;
+                let increment = tile.price * 0.10 * tile.buyoutCount;
+                return Math.round(baseBuyout + increment);
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('p1-money').innerText = players[0].money.toLocaleString();
+            document.getElementById('p2-money').innerText = players[1].money.toLocaleString();
+
+            document.getElementById('p1-properties').innerText = players[0].properties.length > 0 ? players[0].properties.join(', ') : 'Belum ada';
+            document.getElementById('p2-properties').innerText = players[1].properties.length > 0 ? players[1].properties.join(', ') : 'Belum ada';
+
+            document.getElementById('turn-info').innerText = `Giliran: ${players[currentTurn].name}`;
+
+            if(currentTurn === 0) {
+                document.getElementById('p1-card').className = "p-3 bg-red-50 rounded-xl border-2 border-red-600 shadow";
+                document.getElementById('p2-card').className = "p-3 bg-white rounded-xl border border-gray-200";
+            } else {
+                document.getElementById('p1-card').className = "p-3 bg-white rounded-xl border border-gray-200";
+                document.getElementById('p2-card').className = "p-3 bg-red-50 rounded-xl border-2 border-red-600 shadow";
+            }
+
+            let player = players[currentTurn];
+            let currentTile = tiles[player.position];
+            document.getElementById('current-tile-name').innerText = `${currentTile.name} (Kotak #${player.position})`;
+            
+            let desc = "";
+            if(currentTile.type === 'start') desc = "Titik awal permainan.";
+            else if(currentTile.type === 'chance') desc = "Kotak Kesempatan! Ambil kartu kesempatan di bawah.";
+            else if(currentTile.type === 'challenge') desc = "Kotak Tantangan! Ambil kartu tantangan di bawah.";
+            else if(currentTile.type === 'jail') {
+                if (player.inJail) {
+                    desc = "🚨 Kamu sedang berada di PENJARA! Pilih metode untuk bebas.";
+                } else {
+                    desc = "Hanya berkunjung ke Penjara. Aman!";
+                }
+            }
+            else if(currentTile.type === 'property') {
+                if(currentTile.owner === null) {
+                    desc = `Aset/Properti kosong. Harga beli: Rp ${currentTile.price.toLocaleString()}`;
+                } else if(currentTile.owner === currentTurn) {
+                    desc = `Ini properti/stasiun/bandara milikmu sendiri. Aman!`;
+                } else {
+                    let taxPrice = Math.round(currentTile.price * 0.10);
+                    let buyoutPrice = getBuyoutPrice(currentTile);
+                    desc = `Milik ${players[currentTile.owner].name}. Pajak Masuk (10%): Rp ${taxPrice.toLocaleString()} / Buyout: Rp ${buyoutPrice.toLocaleString()}`;
+                }
+            }
+            document.getElementById('current-tile-desc').innerText = desc;
+
+            renderActionButtons(currentTile);
+        }
+
+        function renderActionButtons(tile) {
+            const container = document.getElementById('action-buttons');
+            container.innerHTML = '';
+            let btnRoll = document.getElementById('roll-btn');
+            let player = players[currentTurn];
+
+            if (player.inJail && tile.type === 'jail') {
+                btnRoll.disabled = true;
+                btnRoll.classList.add('opacity-50');
+                container.innerHTML = `
+                    <button onclick="jailPayFine()" class="w-full bg-amber-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-amber-700">Bayar Denda Rp 5.000.000</button>
+                    <button onclick="jailAcceptChallenge()" class="w-full bg-purple-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-purple-700">Terima Tantangan untuk Bebas</button>
+                    <button onclick="jailRollDice()" class="w-full monopoly-red text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-800">Lempar Dadu (Harus Dapat Angka 6)</button>
+                `;
+                return;
+            }
+
+            if (!hasRolled) {
+                btnRoll.disabled = false;
+                btnRoll.classList.remove('opacity-50');
+            } else {
+                btnRoll.disabled = true;
+                btnRoll.classList.add('opacity-50');
+            }
+
+            if(hasRolled && tile.type === 'property') {
+                if(tile.owner === null) {
+                    container.innerHTML = `<button onclick="buyProperty()" class="w-full bg-green-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-green-700">Beli Aset Ini (Rp ${tile.price.toLocaleString()})</button>
+                                           <button onclick="nextTurn()" class="w-full bg-gray-500 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-gray-600">Lewati / Lanjut</button>`;
+                } else if(tile.owner !== currentTurn) {
+                    let taxPrice = Math.round(tile.price * 0.10);
+                    let buyoutPrice = getBuyoutPrice(tile);
+                    container.innerHTML = `<button onclick="payTax()" class="w-full bg-red-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-700">Bayar Pajak Masuk (Rp ${taxPrice.toLocaleString()})</button>
+                                           <button onclick="buyOutProperty()" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-blue-700">Beli / Buyout Aset (Rp ${buyoutPrice.toLocaleString()})</button>`;
+                } else {
+                    container.innerHTML = `<button onclick="nextTurn()" class="w-full monopoly-red text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-800">Lanjut ke Giliran Berikutnya ➔</button>`;
+                }
+            } else if (hasRolled) {
+                container.innerHTML = `<button onclick="nextTurn()" class="w-full monopoly-red text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-800">Lanjut ke Giliran Berikutnya ➔</button>`;
+            } else {
+                container.innerHTML = `<p class="text-xs text-red-600 font-semibold italic">Silakan lempar dadu terlebih dahulu!</p>`;
+            }
+        }
+
+        function rollDice() {
+            if (hasRolled) return;
+            executeRoll((diceRoll) => {
+                let player = players[currentTurn];
+                let oldPos = player.position;
+                let newPos = oldPos + diceRoll;
+
+                if (newPos >= tiles.length) {
+                    newPos = newPos % tiles.length;
+                    player.money += 2000000;
+                    alert(`🎉 Yeay! ${player.name} melewati/mencapai garis START dan mendapatkan bonus Rp 2.000.000 dari Bank Central!`);
+                }
+
+                player.position = newPos;
+                hasRolled = true;
+
+                if (tiles[player.position].type === 'jail') {
+                    player.inJail = true;
+                    alert(`🚨 Oh tidak! ${player.name} masuk ke kotak Penjara!`);
+                }
+
+                updateUI();
+            });
+        }
+
+        function jailRollDice() {
+            executeRoll((diceRoll) => {
+                let player = players[currentTurn];
+                if (diceRoll === 6) {
+                    player.inJail = false;
+                    alert(`🎉 Hore! ${player.name} mendapatkan angka 6 dan berhasil keluar dari penjara!`);
+                    updateUI();
+                } else {
+                    alert(`❌ Yah, dadu menunjukkan angka ${diceRoll}. Kamu belum berhasil keluar dari penjara.`);
+                    nextTurn();
+                }
+            });
+        }
+
+        function jailPayFine() {
+            let player = players[currentTurn];
+            let fine = 5000000;
+            if (player.money >= fine) {
+                player.money -= fine;
+                player.inJail = false;
+                alert(`${player.name} membayar denda Rp 5.000.000 dan bebas dari penjara! 💸`);
+                updateUI();
+            } else {
+                alert("Uang kamu tidak cukup untuk membayar denda penjara!");
+            }
+        }
+
+        function jailAcceptChallenge() {
+            let player = players[currentTurn];
+            let rand = Math.floor(Math.random() * challengeCards.length);
+            player.inJail = false;
+            alert(`${player.name} memilih tantangan untuk bebas:\n\n🔥 "${challengeCards[rand]}"\n\nSelamat, kamu bebas dari penjara! ✨`);
+            updateUI();
+        }
+
+        function executeRoll(callback) {
+            let btnRoll = document.getElementById('roll-btn');
+            let diceIcon = document.getElementById('dice-icon');
+            let diceBox = document.getElementById('dice-box');
+            
+            btnRoll.disabled = true;
+            btnRoll.classList.add('opacity-50');
+            diceBox.classList.add('dice-animating');
+            
+            let counter = 0;
+            let shuffleInterval = setInterval(() => {
+                let randomTemp = Math.floor(Math.random() * 6);
+                diceIcon.innerText = diceSymbols[randomTemp];
+                counter++;
+                
+                if (counter > 10) {
+                    clearInterval(shuffleInterval);
+                    const diceRoll = Math.floor(Math.random() * 6) + 1;
+                    diceBox.classList.remove('dice-animating');
+                    diceIcon.innerText = diceSymbols[diceRoll - 1];
+                    document.getElementById('dice-value').innerText = `Angka Dadu: ${diceRoll}`;
+                    callback(diceRoll);
+                }
+            }, 80);
+        }
+
+        function buyProperty() {
+            let tile = tiles[players[currentTurn].position];
+            let player = players[currentTurn];
+
+            if(player.money >= tile.price) {
+                player.money -= tile.price;
+                tile.owner = currentTurn;
+                tile.buyoutCount = 0;
+                player.properties.push(tile.name);
+                alert(`Yeay! ${player.name} berhasil membeli ${tile.name}! 🎉`);
+                nextTurn();
+            } else {
+                alert("Duh, uang kamu tidak cukup untuk membeli aset ini, sayang!");
+            }
+        }
+
+        function payTax() {
+            let tile = tiles[players[currentTurn].position];
+            let player = players[currentTurn];
+            let owner = players[tile.owner];
+            let taxAmount = Math.round(tile.price * 0.10);
+
+            if (player.money >= taxAmount) {
+                player.money -= taxAmount;
+                owner.money += taxAmount;
+                alert(`${player.name} membayar pajak masuk sebesar Rp ${taxAmount.toLocaleString()} (10% dari harga ${tile.name}) kepada ${owner.name}. 💸`);
+                nextTurn();
+            } else {
+                alert("Uang kamu tidak cukup untuk membayar pajak masuk kota ini!");
+            }
+        }
+
+        function buyOutProperty() {
+            let tile = tiles[players[currentTurn].position];
+            let player = players[currentTurn];
+            let prevOwner = players[tile.owner];
+            let buyoutPrice = getBuyoutPrice(tile);
+
+            if (player.money >= buyoutPrice) {
+                player.money -= buyoutPrice;
+                prevOwner.money += buyoutPrice; 
+
+                prevOwner.properties = prevOwner.properties.filter(p => p !== tile.name);
+                
+                tile.owner = currentTurn;
+                tile.buyoutCount++;
+                player.properties.push(tile.name);
+
+                alert(`Hebat! ${player.name} berhasil melakukan buyout ${tile.name} seharga Rp ${buyoutPrice.toLocaleString()} dari ${prevOwner.name}! 🏢✨`);
+                nextTurn();
+            } else {
+                alert("Duh, uang kamu kurang untuk melakukan pembelian alih (buyout) aset ini!");
+            }
+        }
+
+        function drawCard(type) {
+            let cardText = "";
+            if(type === 'chance') {
+                let rand = Math.floor(Math.random() * chanceCards.length);
+                cardText = "🌟 KESEMPATAN: " + chanceCards[rand];
+            } else {
+                let rand = Math.floor(Math.random() * challengeCards.length);
+                cardText = "🔥 TANTANGAN: " + challengeCards[rand];
+            }
+            document.getElementById('card-display').innerText = cardText;
+        }
+
+        function nextTurn() {
+            currentTurn = currentTurn === 0 ? 1 : 0;
+            hasRolled = false;
+            
+            document.getElementById('card-display').innerText = "Tekan tombol untuk ambil kartu!";
+            document.getElementById('dice-icon').innerText = "⚀";
+            document.getElementById('dice-value').innerText = "Angka: -";
+
+            updateUI();
+        }
+    </script>
+</body>
+</html>
