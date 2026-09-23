@@ -32,7 +32,7 @@
 
     <!-- AUDIO SOUND EFFECT DADU (AMBIL DARI FOLDER LOKAL GITHUB) -->
     <audio id="dice-sound" preload="auto">
-        <source src="assets/dice-roll.mp3" type="audio/mpeg">
+        <source src="dice-roll.mp3" type="audio/mpeg">
     </audio>
 
     <!-- SETUP SCREEN -->
@@ -49,14 +49,7 @@
                 <label class="block text-sm font-bold text-red-900 mb-1">Nama Pemain 2:</label>
                 <input type="text" id="player2-name" placeholder="Tulis Nama" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
             </div>
-            
             <button onclick="startGame()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition">Mulai Permainan 🚀</button>
-            
-            <!-- GARIS PEMISAH -->
-            <div class="border-t border-red-200 my-2"></div>
-
-            <!-- TOMBOL PANDUAN BERMAIN -->
-            <button onclick="openGuideModal()" class="w-full bg-amber-600 text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-amber-700 transition text-sm">📖 Panduan Bermain</button>
         </div>
     </div>
 
@@ -150,12 +143,12 @@
 
     </div>
 
-    <!-- MODAL POPUP GAME -->
+    <!-- MODAL -->
     <div id="card-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div id="modal-box" class="bg-white rounded-2xl monopoly-border p-6 max-w-sm w-full text-center shadow-2xl space-y-4 transition-transform duration-300">
             <div id="modal-icon" class="text-4xl">🌟</div>
             <h3 id="modal-title" class="text-xl font-black text-red-900">INFORMASI</h3>
-            <div id="modal-content" class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300 text-left max-h-60 overflow-y-auto"></div>
+            <div id="modal-content" class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300"></div>
             <button id="modal-close-btn" onclick="closeCardModal()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition">Sudah Selesai ✨</button>
         </div>
     </div>
@@ -229,27 +222,6 @@
             document.getElementById('game-screen').classList.remove('hidden');
 
             updateUI();
-        }
-
-        function openGuideModal() {
-            let guideText = `
-<strong>📜 TATA CARA & ATURAN BERMAIN MONOPOLI BUCIN:</strong><br><br>
-1. <strong>Tujuan Permainan:</strong> Kumpulkan aset kota terbanyak dan jaga saldo uangmu agar tidak habis bersama pasangan!<br><br>
-2. <strong>Garis / Kotak START:</strong><br>
-   - Setiap pemain yang melewati atau mendarat di kotak <strong>START</strong> berhak mendapatkan bonus gaji sebesar <strong>Rp 2.000.000</strong> dari Bank Central.<br><br>
-3. <strong>Pembelian Kota / Properti:</strong><br>
-   - Jika mendarat di kota yang belum bertuan, kamu bisa membelinya sesuai harga kota tersebut.<br><br>
-4. <strong>Pajak & Kota Milik Lawan:</strong><br>
-   - Jika mendarat di kota milik pasanganmu, kamu wajib membayar pajak kunjungan sebesar <strong>10%</strong> dari harga dasar kota tersebut kepada pemiliknya.<br><br>
-5. <strong>Aturan Buyout (Pengambilalihan Kota):</strong><br>
-   - <em>Pembelian / Buyout Pertama:</em> Harganya adalah 1.5x lipat dari harga dasar kota.<br>
-   - <em>Pembelian Selanjutnya:</em> Harga buyout akan bertambah 10% dari harga dasar untuk setiap kali kota tersebut berpindah tangan (akumulasi kenaikan bertingkat).<br><br>
-6. <strong>Kotak Kesempatan & Tantangan:</strong><br>
-   - Berisi misi-misi seru, gombalan, dan tantangan romantis yang harus dilakukan bersama doi.<br><br>
-7. <strong>Kotak Penjara:</strong><br>
-   - Jika masuk penjara, kamu harus bebas dengan membayar denda Rp 5 Juta, menerima tantangan khusus, atau melempar dadu mendapatkan angka 6.
-            `;
-            showPopup("📖 PANDUAN BERMAIN", guideText, "📖");
         }
 
         function getBuyoutPrice(tile) {
@@ -416,7 +388,7 @@
         function showPopup(title, message, icon, isCard = false, cardType = "") {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-icon').innerText = icon;
-            document.getElementById('modal-content').innerHTML = message;
+            document.getElementById('modal-content').innerText = message;
             
             let closeBtn = document.getElementById('modal-close-btn');
             if (isCard) {
@@ -443,7 +415,7 @@
             let modalTitle = currentTile.type === 'chance' ? "🌟 KARTU KESEMPATAN" : "🔥 KARTU TANTANGAN";
             let modalIcon = currentTile.type === 'chance' ? "🌟" : "🔥";
 
-            showPopup(modalTitle, `${players[currentTurn].name}, jalankan perintah ini:<br><br><strong>"${cardText}"</strong>`, modalIcon, true, currentTile.type);
+            showPopup(modalTitle, `${players[currentTurn].name}, jalankan perintah ini:\n\n"${cardText}"`, modalIcon, true, currentTile.type);
         }
 
         function closeCardModal() {
@@ -491,7 +463,7 @@
             let player = players[currentTurn];
             let randCard = challengeCards[Math.floor(Math.random() * challengeCards.length)];
             player.inJail = false;
-            showPopup("✨ BEBAS", `${player.name} bebas dengan tantangan:<br><br>🔥 <strong>"${randCard}"</strong>`, "✨");
+            showPopup("✨ BEBAS", `${player.name} bebas dengan tantangan:\n\n🔥 "${randCard}"`, "✨");
             updateUI();
         }
 
