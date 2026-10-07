@@ -14,6 +14,31 @@
             transform: scaleX(-1) scaleY(-1);
         }
 
+        /* Animasi berdenyut dan bergerak dinamis untuk banner tengah */
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(251, 191, 36, 0.5); }
+            50% { transform: scale(1.03); box-shadow: 0 0 15px rgba(251, 191, 36, 0.9); }
+        }
+        .dynamic-banner {
+            animation: pulseGlow 3s infinite ease-in-out;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .dynamic-banner:active {
+            transform: scale(0.97);
+        }
+
+        /* Animasi pop-up tipis kilat */
+        @keyframes toastFade {
+            0% { opacity: 0; transform: translateY(-10px) scale(0.95); }
+            15% { opacity: 1; transform: translateY(0) scale(1); }
+            85% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-10px) scale(0.95); }
+        }
+        .toast-popup {
+            animation: toastFade 2.8s forwards ease-in-out;
+        }
+
         .game-slider {
             -webkit-appearance: none;
             width: 100%;
@@ -66,9 +91,25 @@
     <audio id="dice-sound" preload="auto">
         <source src="dice-roll.mp3" type="audio/mpeg">
     </audio>
+    <audio id="sound-chance" preload="auto">
+        <source src="Sound_Kesempatan.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-challenge" preload="auto">
+        <source src="Sound_Tantangan.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-transaction" preload="auto">
+        <source src="Sound_Transaksi.mp3" type="audio/mpeg">
+    </audio>
     <audio id="bgm" loop preload="auto">
         <source src="Backsound.mp3" type="audio/mpeg">
     </audio>
+
+    <!-- TOAST POP-UP TIPIS KILAT -->
+    <div id="toast-container" class="fixed top-4 inset-x-0 z-[100] flex justify-center px-4 pointer-events-none hidden">
+        <div id="toast-box" class="bg-amber-100 border-2 border-amber-500 text-red-900 px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold text-center toast-popup max-w-xs">
+            ✨ Pesan Bucin Di Sini ✨
+        </div>
+    </div>
 
     <!-- SETUP SCREEN -->
     <div id="setup-screen" class="w-full max-w-md bg-white monopoly-border rounded-2xl p-6 shadow-xl my-auto z-50">
@@ -146,8 +187,8 @@
                     <div class="flex flex-col justify-between h-[152px]">
                         <div class="bg-white monopoly-border rounded-2xl p-2 shadow flex flex-col space-y-1.5 justify-center flex-1">
                             <p class="text-[10px] font-bold text-gray-500 text-center uppercase">Buka Kartu</p>
-                            <button onclick="triggerCardPopup('chance')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-blue-700 transition">Kesempatan</button>
-                            <button onclick="triggerCardPopup('challenge')" class="w-full bg-[#dc2626] text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-700 transition">Tantangan</button>
+                            <button onclick="triggerCardPopup(1, 'chance')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-blue-700 transition">Kesempatan</button>
+                            <button onclick="triggerCardPopup(1, 'challenge')" class="w-full bg-[#dc2626] text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-700 transition">Tantangan</button>
                         </div>
                         <button onclick="openTransactionModal(1)" class="w-full bg-[#16a34a] text-white font-black text-xs py-3 rounded-2xl shadow-lg hover:bg-green-700 transition mt-1.5">
                             Transaksi
@@ -157,7 +198,7 @@
             </div>
         </div>
 
-        <!-- PANEL TENGAH (Header, Sound, Panduan) -->
+        <!-- PANEL TENGAH (Header, Sound, Panduan & Banner Dinamis) -->
         <div class="w-full bg-[#800000] monopoly-border rounded-2xl p-3 shadow-md flex items-center justify-between">
             <div class="flex items-center space-x-1.5">
                 <button onclick="toggleMuteSound()" class="w-8 h-8 flex items-center justify-center bg-amber-600 rounded-xl shadow border border-amber-800 text-white cursor-pointer hover:bg-amber-700 transition" title="Mute/Unmute Sound">
@@ -168,12 +209,13 @@
                 </button>
             </div>
             
-            <div class="bg-white border-2 border-amber-400 rounded-xl px-3 py-1.5 text-center shadow">
-                <h2 class="text-xs font-black text-red-900 tracking-wide">MONOPOLI BUCIN</h2>
-                <p class="text-[9px] font-bold text-amber-700">by Alkasa Craft</p>
+            <!-- BANNER TENGAH DINAMIS & INTERAKTIF -->
+            <div onclick="triggerDynamicBannerToast()" class="bg-white border-2 border-amber-400 rounded-xl px-3 py-1.5 text-center shadow dynamic-banner flex-1 mx-2 overflow-hidden">
+                <h2 id="dynamic-title" class="text-xs font-black text-red-900 tracking-wide transition-all duration-500">MONOPOLI BUCIN</h2>
+                <p id="dynamic-subtitle" class="text-[9px] font-bold text-amber-700 transition-all duration-500">by Alkasa Craft</p>
             </div>
 
-            <button onclick="openGuideModal()" class="bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-xl shadow border border-amber-800 hover:bg-amber-700 transition text-[11px] flex items-center space-x-1">
+            <button onclick="openGuideModal()" class="bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-xl shadow border border-amber-800 hover:bg-amber-700 transition text-[11px] flex items-center space-x-1 shrink-0">
                 <span>📖 Panduan</span>
             </button>
         </div>
@@ -208,8 +250,8 @@
                 <div class="flex flex-col justify-between h-[152px]">
                     <div class="bg-white monopoly-border rounded-2xl p-2 shadow flex flex-col space-y-1.5 justify-center flex-1">
                         <p class="text-[10px] font-bold text-gray-500 text-center uppercase">Buka Kartu</p>
-                        <button onclick="triggerCardPopup('chance')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-blue-700 transition">Kesempatan</button>
-                        <button onclick="triggerCardPopup('challenge')" class="w-full bg-[#dc2626] text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-700 transition">Tantangan</button>
+                        <button onclick="triggerCardPopup(0, 'chance')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-blue-700 transition">Kesempatan</button>
+                        <button onclick="triggerCardPopup(0, 'challenge')" class="w-full bg-[#dc2626] text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-700 transition">Tantangan</button>
                     </div>
                     <button onclick="openTransactionModal(0)" class="w-full bg-[#16a34a] text-white font-black text-xs py-3 rounded-2xl shadow-lg hover:bg-green-700 transition mt-1.5">
                         Transaksi
@@ -302,7 +344,7 @@
         ];
 
         const challengeCards = [
-            "[ME] jalankan perintah ini: Bikin [PARTNER] tertawa dalam waktu 30 detik",
+            "Bikin [PARTNER] tertawa dalam waktu 30 detik",
             "Kamu wajib monyong selama 1 putaran!",
             "Gombalin [PARTNER] sampai dia salting.",
             "Nyanyiin lagu yang paling ngingetin kamu sama [PARTNER].",
@@ -313,6 +355,26 @@
             "Ganti Photo Profil kamu dengan foto [PARTNER]"
         ];
 
+        // Daftar teks dinamis & pesan pop-up tipis untuk banner tengah
+        const dynamicBannerMessages = [
+            { title: "MONOPOLI BUCIN", subtitle: "by Alkasa Craft" },
+            { title: "💖 EHEM, SAYANG...", subtitle: "Fokus main jangan melamun!" },
+            { title: "✨ CINTA & INVESTASI", subtitle: "Siapa paling kaya harta & cinta?" },
+            { title: "🌹 DATE NIGHT GOALS", subtitle: "Kumpulkan aset kota impian!" },
+            { title: "🔥 HATI-HATI BANGKRUT", subtitle: "Jangan kalah gombal sama doi!" }
+        ];
+
+        const miniToastQuotes = [
+            "💖 Sentuhan maut: Jangan lupa senyum ke doi sekarang!",
+            "✨ Alkasa Craft: Game seru buat nambah kemesraan kalian!",
+            "🌹 Awas! Saldo berkurang, tapi cinta makin bertambah.",
+            "🔥 Siapa pemilik kota paling romantis hari ini?",
+            "💫 Tepuk tangan 3x buat pasangan paling seru!"
+        ];
+
+        let bannerIndex = 0;
+        let bannerInterval = null;
+
         let players = [
             { id: 0, name: "Pemain 1", money: 10000000 },
             { id: 1, name: "Pemain 2", money: 10000000 }
@@ -322,6 +384,7 @@
         let previousSoundVolume = 1;
         let currentTransactionPlayer = 0;
         let activeSelectedTileIndex = null;
+        let toastTimeout = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.game-slider').forEach(slider => {
@@ -329,7 +392,13 @@
             });
             updateMusicIcon(1);
             updateSoundIcon(1);
-            document.getElementById('dice-sound').volume = document.getElementById('sound-slider').value;
+            
+            // Set volume untuk semua elemen audio berdasarkan slider sound
+            const currentSoundVol = document.getElementById('sound-slider').value;
+            document.getElementById('dice-sound').volume = currentSoundVol;
+            document.getElementById('sound-chance').volume = currentSoundVol;
+            document.getElementById('sound-challenge').volume = currentSoundVol;
+            document.getElementById('sound-transaction').volume = currentSoundVol;
         });
 
         function updateSliderProgress(slider) {
@@ -360,7 +429,14 @@
         function onSoundSliderInput(slider) {
             const val = parseFloat(slider.value);
             const diceSound = document.getElementById('dice-sound');
+            const soundChance = document.getElementById('sound-chance');
+            const soundChallenge = document.getElementById('sound-challenge');
+            const soundTransaction = document.getElementById('sound-transaction');
+
             if(diceSound) diceSound.volume = val;
+            if(soundChance) soundChance.volume = val;
+            if(soundChallenge) soundChallenge.volume = val;
+            if(soundTransaction) soundTransaction.volume = val;
             
             if (val > 0) {
                 previousSoundVolume = val;
@@ -435,13 +511,52 @@
                 }
             }
 
+            startDynamicBannerRotation();
             updateUI();
+        }
+
+        function startDynamicBannerRotation() {
+            if (bannerInterval) clearInterval(bannerInterval);
+            bannerInterval = setInterval(() => {
+                bannerIndex = (bannerIndex + 1) % dynamicBannerMessages.length;
+                let currentItem = dynamicBannerMessages[bannerIndex];
+                
+                let titleEl = document.getElementById('dynamic-title');
+                let subEl = document.getElementById('dynamic-subtitle');
+                
+                if (titleEl && subEl) {
+                    titleEl.innerText = currentItem.title;
+                    subEl.innerText = currentItem.subtitle;
+                }
+            }, 4000);
+        }
+
+        function triggerDynamicBannerToast() {
+            let randomQuote = miniToastQuotes[Math.floor(Math.random() * miniToastQuotes.length)];
+            let toastContainer = document.getElementById('toast-container');
+            let toastBox = document.getElementById('toast-box');
+
+            toastBox.innerText = randomQuote;
+            toastContainer.classList.remove('hidden');
+
+            toastBox.style.animation = 'none';
+            void toastBox.offsetWidth;
+            toastBox.style.animation = 'toastFade 2.8s forwards ease-in-out';
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toastContainer.classList.add('hidden');
+            }, 2800);
         }
 
         function closeAllModals() {
             document.getElementById('card-modal').classList.add('hidden');
             document.getElementById('transaction-modal').classList.add('hidden');
             document.getElementById('asset-action-modal').classList.add('hidden');
+            
+            document.getElementById('modal-box').classList.remove('flipped-container');
+            document.getElementById('transaction-modal-box').classList.remove('flipped-container');
+            document.getElementById('asset-action-modal-box').classList.remove('flipped-container');
         }
 
         function openGuideModal() {
@@ -449,18 +564,18 @@
             let guideText = `
 <strong>📜 TATA CARA & ATURAN BERMAIN MONOPOLI BUCIN:</strong><br><br>
 1. <strong>Tujuan Permainan:</strong> Kumpulkan aset kota terbanyak dan jaga saldo uangmu agar tidak habis bersama pasangan!<br><br>
-2. <strong>Pembelian & Transaksi Bebas (2 Pemain Bersamaan):</strong><br>
-   - Kedua pemain dapat melakukan transaksi kapan saja secara bersamaan tanpa harus bergiliran dengan menekan tombol <strong>Transaksi</strong>.<br>
-   - Tombol "Pilih" berwarna <strong>Abu-abu</strong> menandakan aset milik Bank Central (belum ada pemilik).<br>
+2. <strong>Banner Tengah Interaktif:</strong> Klik pada bagian kotak <strong>Monopoli Bucin</strong> di tengah layar untuk memunculkan pop-up tipis kilat berisi pesan gombalan romantis secara instan.<br><br>
+3. <strong>Pembelian & Transaksi Bebas (2 Pemain Bersamaan):</strong><br>
+   - Kedua pemain dapat melakukan transaksi kapan saja secara bersamaan dengan menekan tombol <strong>Transaksi</strong>.<br>
+   - Pop-up transaksi dan aksi aset otomatis menyesuaikan arah posisi duduk (Pemain 1 di bawah, Pemain 2 di atas).<br>
+   - Tombol "Pilih" berwarna <strong>Abu-abu</strong> menandakan aset milik Bank Central.<br>
    - Tombol "Pilih" berwarna <strong>Merah</strong> menandakan aset milik pemain lain.<br>
    - Tombol "Pilih" berwarna <strong>Hijau (#16a34a)</strong> menandakan aset milik sendiri.<br><br>
-3. <strong>Aturan Buyout, Harga Aset, & Penjualan ke Bank:</strong><br>
+4. <strong>Aturan Buyout & Penjualan ke Bank:</strong><br>
    - Nominal harga pada daftar Aset/Kota pemain otomatis mengikuti harga pembelian atau buyout terakhir.<br>
-   - Apabila pemain menjual aset/kota ke Bank Central, harga jualnya adalah harga tertinggi saat beli/buyout dikurangi 10% bunga/pajak Bank Central.<br><br>
-4. <strong>Kotak Kesempatan & Tantangan:</strong><br>
-   - Tekan tombol Kesempatan atau Tantangan kapan saja untuk memunculkan kartu acak berisi misi seru dan gombalan romantis bersama doi.
+   - Apabila pemain menjual aset/kota ke Bank Central, harganya dikurangi 10% potongan bunga/pajak Bank.
             `;
-            showPopup("📖 PANDUAN BERMAIN", guideText, "📖");
+            showPopup(0, "📖 PANDUAN BERMAIN", guideText, "📖");
         }
 
         function getBuyoutPrice(tile) {
@@ -511,7 +626,7 @@
             });
         }
 
-        function triggerCardPopup(cardType) {
+        function triggerCardPopup(playerIdx, cardType) {
             closeAllModals();
             let activePlayerName = players[0].name;
             let opponentPlayerName = players[1].name;
@@ -519,8 +634,12 @@
             let rawCardText = "";
             if (cardType === 'chance') {
                 rawCardText = chanceCards[Math.floor(Math.random() * chanceCards.length)];
+                // Putar sound effect kartu kesempatan
+                playAudioEffect('sound-chance');
             } else {
                 rawCardText = challengeCards[Math.floor(Math.random() * challengeCards.length)];
+                // Putar sound effect kartu tantangan
+                playAudioEffect('sound-challenge');
             }
 
             let cardText = rawCardText
@@ -530,10 +649,18 @@
             let modalTitle = cardType === 'chance' ? "🌟 KARTU KESEMPATAN" : "🔥 KARTU TANTANGAN";
             let modalIcon = cardType === 'chance' ? "🌟" : "🔥";
 
-            showPopup(modalTitle, `Jalankan perintah ini:<br><br><strong>"${cardText}"</strong>`, modalIcon);
+            showPopup(playerIdx, modalTitle, `Jalankan perintah ini:<br><br><strong>"${cardText}"</strong>`, modalIcon);
         }
 
-        function showPopup(title, message, icon) {
+        function playAudioEffect(elementId) {
+            const audioEl = document.getElementById(elementId);
+            if (audioEl) {
+                audioEl.currentTime = 0;
+                audioEl.play().catch(e => console.log("Audio effect play error:", e));
+            }
+        }
+
+        function showPopup(playerIdx, title, message, icon) {
             closeAllModals();
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-icon').innerText = icon;
@@ -544,7 +671,11 @@
             closeBtn.setAttribute("onclick", "closeAllModals()");
 
             const modalBox = document.getElementById('modal-box');
-            modalBox.classList.remove('flipped-container');
+            if (playerIdx === 1) {
+                modalBox.classList.add('flipped-container');
+            } else {
+                modalBox.classList.remove('flipped-container');
+            }
 
             document.getElementById('card-modal').classList.remove('hidden');
         }
@@ -555,6 +686,13 @@
             currentTransactionPlayer = playerIdx;
             const container = document.getElementById('transaction-list-container');
             container.innerHTML = '';
+
+            const modalBox = document.getElementById('transaction-modal-box');
+            if (playerIdx === 1) {
+                modalBox.classList.add('flipped-container');
+            } else {
+                modalBox.classList.remove('flipped-container');
+            }
 
             const propertyTiles = tiles.filter(t => t.type === 'property');
 
@@ -590,10 +728,17 @@
         }
 
         function openAssetActionModal(tileIndex) {
-            closeAllModals(); // Menutup pop-up transaksi sebelumnya secara otomatis
+            closeAllModals();
             activeSelectedTileIndex = tileIndex;
             let tile = tiles[tileIndex];
             let player = players[currentTransactionPlayer];
+
+            const modalBox = document.getElementById('asset-action-modal-box');
+            if (currentTransactionPlayer === 1) {
+                modalBox.classList.add('flipped-container');
+            } else {
+                modalBox.classList.remove('flipped-container');
+            }
 
             document.getElementById('action-city-name').innerText = tile.name;
             document.getElementById('action-city-price').innerText = `Rp${tile.currentDisplayPrice.toLocaleString('id-ID')}`;
@@ -640,10 +785,14 @@
                 tile.owner = currentTransactionPlayer;
                 tile.currentDisplayPrice = tile.price;
                 tile.buyoutCount = 0;
+                
+                // Putar sound effect transaksi beli/jual
+                playAudioEffect('sound-transaction');
+
                 updateUI();
-                showPopup("🎉 BERHASIL", `${player.name} berhasil membeli ${tile.name} seharga Rp${tile.price.toLocaleString('id-ID')}!`, "🎉");
+                showPopup(currentTransactionPlayer, "🎉 BERHASIL", `${player.name} berhasil membeli ${tile.name} seharga Rp${tile.price.toLocaleString('id-ID')}!`, "🎉");
             } else {
-                showPopup("⚠️ SALDO KURANG", "Uang kamu tidak cukup untuk membeli aset ini!", "⚠️");
+                showPopup(currentTransactionPlayer, "⚠️ SALDO KURANG", "Uang kamu tidak cukup untuk membeli aset ini!", "⚠️");
             }
         }
 
@@ -659,8 +808,11 @@
             tile.currentDisplayPrice = originalBasePrice;
             tile.buyoutCount = 0;
 
+            // Putar sound effect transaksi beli/jual
+            playAudioEffect('sound-transaction');
+
             updateUI();
-            showPopup("💰 TERJUAL KE BANK", `${player.name} menjual ${tile.name} ke Bank Central seharga Rp${sellPrice.toLocaleString('id-ID')} (setelah potongan bunga 10%).`, "💰");
+            showPopup(currentTransactionPlayer, "💰 TERJUAL KE BANK", `${player.name} menjual ${tile.name} ke Bank Central seharga Rp${sellPrice.toLocaleString('id-ID')} (setelah potongan bunga 10%).`, "💰");
         }
 
         function executeBuyoutProperty() {
@@ -676,10 +828,14 @@
                 tile.owner = currentTransactionPlayer;
                 tile.currentDisplayPrice = buyoutPrice;
                 tile.buyoutCount++;
+
+                // Putar sound effect transaksi beli/jual
+                playAudioEffect('sound-transaction');
+
                 updateUI();
-                showPopup("🏢 BUYOUT SUKSES", `${player.name} mengambil alih ${tile.name} seharga Rp${buyoutPrice.toLocaleString('id-ID')}!`, "🏢");
+                showPopup(currentTransactionPlayer, "🏢 BUYOUT SUKSES", `${player.name} mengambil alih ${tile.name} seharga Rp${buyoutPrice.toLocaleString('id-ID')}!`, "🏢");
             } else {
-                showPopup("⚠️ SALDO KURANG", "Uang kamu kurang untuk melakukan buyout aset ini!", "⚠️");
+                showPopup(currentTransactionPlayer, "⚠️ SALDO KURANG", "Uang kamu kurang untuk melakukan buyout aset ini!", "⚠️");
             }
         }
 
@@ -692,10 +848,14 @@
             if (player.money >= taxAmount) {
                 player.money -= taxAmount;
                 owner.money += taxAmount;
+
+                // Putar sound effect transaksi pembayaran pajak
+                playAudioEffect('sound-transaction');
+
                 updateUI();
-                showPopup("💸 PAJAK DIBAYAR", `${player.name} membayar pajak Rp${taxAmount.toLocaleString('id-ID')} kepada ${owner.name}.`, "💸");
+                showPopup(currentTransactionPlayer, "💸 PAJAK DIBAYAR", `${player.name} membayar pajak Rp${taxAmount.toLocaleString('id-ID')} kepada ${owner.name}.`, "💸");
             } else {
-                showPopup("⚠️ SALDO KURANG", "Uang kamu tidak cukup untuk membayar pajak!", "⚠️");
+                showPopup(currentTransactionPlayer, "⚠️ SALDO KURANG", "Uang kamu tidak cukup untuk membayar pajak!", "⚠️");
             }
         }
     </script>
