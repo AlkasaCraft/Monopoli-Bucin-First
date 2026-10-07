@@ -277,7 +277,7 @@
         <div id="transaction-modal-box" class="bg-white rounded-2xl monopoly-border p-5 max-w-sm w-full text-center shadow-2xl space-y-3 transition-transform duration-300">
             <h3 class="text-lg font-black text-red-900 mb-2">Transaksi Aset / Kota</h3>
             <div id="transaction-list-container" class="bg-red-50 p-3 rounded-xl max-h-72 overflow-y-auto asset-scroll-box space-y-2 border border-dashed border-red-300 text-left">
-                <!-- List Aset / Kota dynamically populated -->
+                <!-- List Aset / Kota secara dinamis -->
             </div>
             <button onclick="closeAllModals()" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-sm">Kembali ke Game</button>
         </div>
@@ -298,7 +298,22 @@
                 </div>
             </div>
             <div id="action-buttons-container" class="space-y-2 pt-1">
-                <!-- Dynamically filled action buttons -->
+                <!-- Tombol aksi dinamis -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PERSETUJUAN KLAIM BONUS (UNTUK PEMAIN LAWAN) -->
+    <div id="claim-approval-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+        <div id="claim-approval-box" class="bg-white rounded-2xl monopoly-border p-6 max-w-sm w-full text-center shadow-2xl space-y-4 transition-transform duration-300">
+            <div class="text-4xl">🎁</div>
+            <h3 class="text-xl font-black text-red-900">Persetujuan Klaim Bonus</h3>
+            <div id="claim-approval-text" class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300 text-center">
+                Pemain lain meminta klaim Bonus Putaran senilai Rp500.000 dari Bank Central. Apakah Anda menyetujuinya?
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="resolveClaimApproval(true)" class="w-full bg-[#16a34a] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-green-700 transition text-xs">Setujui Klaim</button>
+                <button onclick="resolveClaimApproval(false)" class="w-full bg-red-600 text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-700 transition text-xs">Tolak Klaim</button>
             </div>
         </div>
     </div>
@@ -355,7 +370,6 @@
             "Ganti Photo Profil kamu dengan foto [PARTNER]"
         ];
 
-        // Daftar teks dinamis & pesan pop-up tipis untuk banner tengah
         const dynamicBannerMessages = [
             { title: "MONOPOLI BUCIN", subtitle: "by Alkasa Craft" },
             { title: "💖 EHEM, SAYANG...", subtitle: "Fokus main jangan melamun!" },
@@ -393,7 +407,6 @@
             updateMusicIcon(1);
             updateSoundIcon(1);
             
-            // Set volume untuk semua elemen audio berdasarkan slider sound
             const currentSoundVol = document.getElementById('sound-slider').value;
             document.getElementById('dice-sound').volume = currentSoundVol;
             document.getElementById('sound-chance').volume = currentSoundVol;
@@ -553,10 +566,12 @@
             document.getElementById('card-modal').classList.add('hidden');
             document.getElementById('transaction-modal').classList.add('hidden');
             document.getElementById('asset-action-modal').classList.add('hidden');
+            document.getElementById('claim-approval-modal').classList.add('hidden');
             
             document.getElementById('modal-box').classList.remove('flipped-container');
             document.getElementById('transaction-modal-box').classList.remove('flipped-container');
             document.getElementById('asset-action-modal-box').classList.remove('flipped-container');
+            document.getElementById('claim-approval-box').classList.remove('flipped-container');
         }
 
         function openGuideModal() {
@@ -568,9 +583,7 @@
 3. <strong>Pembelian & Transaksi Bebas (2 Pemain Bersamaan):</strong><br>
    - Kedua pemain dapat melakukan transaksi kapan saja secara bersamaan dengan menekan tombol <strong>Transaksi</strong>.<br>
    - Pop-up transaksi dan aksi aset otomatis menyesuaikan arah posisi duduk (Pemain 1 di bawah, Pemain 2 di atas).<br>
-   - Tombol "Pilih" berwarna <strong>Abu-abu</strong> menandakan aset milik Bank Central.<br>
-   - Tombol "Pilih" berwarna <strong>Merah</strong> menandakan aset milik pemain lain.<br>
-   - Tombol "Pilih" berwarna <strong>Hijau (#16a34a)</strong> menandakan aset milik sendiri.<br><br>
+   - Tersedia opsi <strong>Klaim Bonus Putaran</strong> di dalam menu Transaksi (berada tepat di atas list kota Jakarta) untuk mendapatkan Rp500.000 dari Bank Central dengan persetujuan pemain lawan.<br><br>
 4. <strong>Aturan Buyout & Penjualan ke Bank:</strong><br>
    - Nominal harga pada daftar Aset/Kota pemain otomatis mengikuti harga pembelian atau buyout terakhir.<br>
    - Apabila pemain menjual aset/kota ke Bank Central, harganya dikurangi 10% potongan bunga/pajak Bank.
@@ -634,11 +647,9 @@
             let rawCardText = "";
             if (cardType === 'chance') {
                 rawCardText = chanceCards[Math.floor(Math.random() * chanceCards.length)];
-                // Putar sound effect kartu kesempatan
                 playAudioEffect('sound-chance');
             } else {
                 rawCardText = challengeCards[Math.floor(Math.random() * challengeCards.length)];
-                // Putar sound effect kartu tantangan
                 playAudioEffect('sound-challenge');
             }
 
@@ -694,6 +705,27 @@
                 modalBox.classList.remove('flipped-container');
             }
 
+            // ==========================================
+            // TAMBAHAN: OPSI "Klaim Bonus Putaran"
+            // Diposisikan tepat DI ATAS list kota Jakarta
+            // ==========================================
+            let bonusRowDiv = document.createElement('div');
+            bonusRowDiv.className = "bg-amber-50 border-2 border-amber-400 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
+
+            let bonusNameSpan = document.createElement('span');
+            bonusNameSpan.className = "font-black text-amber-900 text-xs truncate mr-2 flex items-center space-x-1";
+            bonusNameSpan.innerHTML = "🎁 Klaim Bonus Putaran";
+
+            let claimBtn = document.createElement('button');
+            claimBtn.className = "bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0";
+            claimBtn.innerText = "Klaim";
+            claimBtn.onclick = () => requestClaimBonus(currentTransactionPlayer);
+
+            bonusRowDiv.appendChild(bonusNameSpan);
+            bonusRowDiv.appendChild(claimBtn);
+            container.appendChild(bonusRowDiv);
+
+            // Daftar properti kota lainnya
             const propertyTiles = tiles.filter(t => t.type === 'property');
 
             propertyTiles.forEach(tile => {
@@ -725,6 +757,44 @@
             });
 
             document.getElementById('transaction-modal').classList.remove('hidden');
+        }
+
+        // --- FITUR KLAIM BONUS PUTARAN & PERSETUJUAN LAWAN ---
+        function requestClaimBonus(requesterIdx) {
+            closeAllModals();
+            let opponentIdx = requesterIdx === 0 ? 1 : 0;
+            let requesterName = players[requesterIdx].name;
+
+            // Atur arah pop-up persetujuan pemain lawan (jika lawan adalah P2, balikkan kontainer modalnya)
+            const approvalBox = document.getElementById('claim-approval-box');
+            if (opponentIdx === 1) {
+                approvalBox.classList.add('flipped-container');
+            } else {
+                approvalBox.classList.remove('flipped-container');
+            }
+
+            document.getElementById('claim-approval-text').innerHTML = 
+                `<strong>${requesterName}</strong> ingin melakukan Klaim Bonus Putaran senilai <strong>Rp500.000</strong> dari Bank Central.<br><br>Setujui klaim bonus ini?`;
+
+            // Simpan data sementara siapa yang merequest
+            window.pendingClaimRequester = requesterIdx;
+            document.getElementById('claim-approval-modal').classList.remove('hidden');
+        }
+
+        function resolveClaimApproval(isApproved) {
+            closeAllModals();
+            let requesterIdx = window.pendingClaimRequester;
+            let requester = players[requesterIdx];
+
+            if (isApproved) {
+                // Berhak mendapatkan Rp500.000 dari Bank Central
+                requester.money += 500000;
+                playAudioEffect('sound-transaction');
+                updateUI();
+                showPopup(requesterIdx, "🎉 KLAIM DISETUJUI", `Selamat! ${requester.name} berhasil mendapatkan <strong>Rp500.000</strong> dari Bank Central atas persetujuan pemain lawan!`, "🎉");
+            } else {
+                showPopup(requesterIdx, "❌ KLAIM DITOLAK", `Maaf, permintaan Klaim Bonus Putaran oleh ${requester.name} ditolak oleh pemain lawan.`, "❌");
+            }
         }
 
         function openAssetActionModal(tileIndex) {
@@ -786,9 +856,7 @@
                 tile.currentDisplayPrice = tile.price;
                 tile.buyoutCount = 0;
                 
-                // Putar sound effect transaksi beli/jual
                 playAudioEffect('sound-transaction');
-
                 updateUI();
                 showPopup(currentTransactionPlayer, "🎉 BERHASIL", `${player.name} berhasil membeli ${tile.name} seharga Rp${tile.price.toLocaleString('id-ID')}!`, "🎉");
             } else {
@@ -808,9 +876,7 @@
             tile.currentDisplayPrice = originalBasePrice;
             tile.buyoutCount = 0;
 
-            // Putar sound effect transaksi beli/jual
             playAudioEffect('sound-transaction');
-
             updateUI();
             showPopup(currentTransactionPlayer, "💰 TERJUAL KE BANK", `${player.name} menjual ${tile.name} ke Bank Central seharga Rp${sellPrice.toLocaleString('id-ID')} (setelah potongan bunga 10%).`, "💰");
         }
@@ -829,9 +895,7 @@
                 tile.currentDisplayPrice = buyoutPrice;
                 tile.buyoutCount++;
 
-                // Putar sound effect transaksi beli/jual
                 playAudioEffect('sound-transaction');
-
                 updateUI();
                 showPopup(currentTransactionPlayer, "🏢 BUYOUT SUKSES", `${player.name} mengambil alih ${tile.name} seharga Rp${buyoutPrice.toLocaleString('id-ID')}!`, "🏢");
             } else {
@@ -849,9 +913,7 @@
                 player.money -= taxAmount;
                 owner.money += taxAmount;
 
-                // Putar sound effect transaksi pembayaran pajak
                 playAudioEffect('sound-transaction');
-
                 updateUI();
                 showPopup(currentTransactionPlayer, "💸 PAJAK DIBAYAR", `${player.name} membayar pajak Rp${taxAmount.toLocaleString('id-ID')} kepada ${owner.name}.`, "💸");
             } else {
