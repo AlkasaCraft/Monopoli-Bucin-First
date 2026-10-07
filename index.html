@@ -22,10 +22,15 @@
         .dynamic-banner {
             animation: pulseGlow 3s infinite ease-in-out;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.5s ease-in-out;
         }
         .dynamic-banner:active {
             transform: scale(0.97);
+        }
+
+        /* Kelas untuk memutar orientasi banner ke arah Pemain 2 (putar 180 derajat) */
+        .banner-flipped {
+            transform: rotate(180deg);
         }
 
         /* Animasi pop-up tipis kilat */
@@ -209,10 +214,10 @@
                 </button>
             </div>
             
-            <!-- BANNER TENGAH DINAMIS & INTERAKTIF -->
-            <div onclick="triggerDynamicBannerToast()" class="bg-white border-2 border-amber-400 rounded-xl px-3 py-1.5 text-center shadow dynamic-banner flex-1 mx-2 overflow-hidden">
-                <h2 id="dynamic-title" class="text-xs font-black text-red-900 tracking-wide transition-all duration-500">MONOPOLI BUCIN</h2>
-                <p id="dynamic-subtitle" class="text-[9px] font-bold text-amber-700 transition-all duration-500">by Alkasa Craft</p>
+            <!-- BANNER TENGAH (Teks: MONOPOLI BUCIN by Alkasa Craft bergantian menghadap P1 & P2 tiap 5 detik) -->
+            <div id="banner-box" onclick="triggerDynamicBannerToast()" class="bg-white border-2 border-amber-400 rounded-xl px-3 py-1.5 text-center shadow dynamic-banner flex-1 mx-2 overflow-hidden">
+                <h2 class="text-xs font-black text-red-900 tracking-wide">MONOPOLI BUCIN</h2>
+                <p class="text-[9px] font-bold text-amber-700">by Alkasa Craft</p>
             </div>
 
             <button onclick="openGuideModal()" class="bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-xl shadow border border-amber-800 hover:bg-amber-700 transition text-[11px] flex items-center space-x-1 shrink-0">
@@ -370,14 +375,6 @@
             "Ganti Photo Profil kamu dengan foto [PARTNER]"
         ];
 
-        const dynamicBannerMessages = [
-            { title: "MONOPOLI BUCIN", subtitle: "by Alkasa Craft" },
-            { title: "💖 EHEM, SAYANG...", subtitle: "Fokus main jangan melamun!" },
-            { title: "✨ CINTA & INVESTASI", subtitle: "Siapa paling kaya harta & cinta?" },
-            { title: "🌹 DATE NIGHT GOALS", subtitle: "Kumpulkan aset kota impian!" },
-            { title: "🔥 HATI-HATI BANGKRUT", subtitle: "Jangan kalah gombal sama doi!" }
-        ];
-
         const miniToastQuotes = [
             "💖 Sentuhan maut: Jangan lupa senyum ke doi sekarang!",
             "✨ Alkasa Craft: Game seru buat nambah kemesraan kalian!",
@@ -386,8 +383,8 @@
             "💫 Tepuk tangan 3x buat pasangan paling seru!"
         ];
 
-        let bannerIndex = 0;
         let bannerInterval = null;
+        let isBannerFlippedToPlayer2 = false;
 
         let players = [
             { id: 0, name: "Pemain 1", money: 10000000 },
@@ -531,17 +528,16 @@
         function startDynamicBannerRotation() {
             if (bannerInterval) clearInterval(bannerInterval);
             bannerInterval = setInterval(() => {
-                bannerIndex = (bannerIndex + 1) % dynamicBannerMessages.length;
-                let currentItem = dynamicBannerMessages[bannerIndex];
-                
-                let titleEl = document.getElementById('dynamic-title');
-                let subEl = document.getElementById('dynamic-subtitle');
-                
-                if (titleEl && subEl) {
-                    titleEl.innerText = currentItem.title;
-                    subEl.innerText = currentItem.subtitle;
+                isBannerFlippedToPlayer2 = !isBannerFlippedToPlayer2;
+                let bannerBox = document.getElementById('banner-box');
+                if (bannerBox) {
+                    if (isBannerFlippedToPlayer2) {
+                        bannerBox.classList.add('banner-flipped');
+                    } else {
+                        bannerBox.classList.remove('banner-flipped');
+                    }
                 }
-            }, 4000);
+            }, 5000);
         }
 
         function triggerDynamicBannerToast() {
@@ -579,7 +575,7 @@
             let guideText = `
 <strong>📜 TATA CARA & ATURAN BERMAIN MONOPOLI BUCIN:</strong><br><br>
 1. <strong>Tujuan Permainan:</strong> Kumpulkan aset kota terbanyak dan jaga saldo uangmu agar tidak habis bersama pasangan!<br><br>
-2. <strong>Banner Tengah Interaktif:</strong> Klik pada bagian kotak <strong>Monopoli Bucin</strong> di tengah layar untuk memunculkan pop-up tipis kilat berisi pesan gombalan romantis secara instan.<br><br>
+2. <strong>Banner Tengah Interaktif:</strong> Teks banner <strong>MONOPOLI BUCIN by Alkasa Craft</strong> berputar otomatis setiap 5 detik secara bergantian menghadap ke Pemain 1 dan Pemain 2. Klik banner untuk memunculkan pop-up pesan gombalan romantis secara instan.<br><br>
 3. <strong>Pembelian & Transaksi Bebas (2 Pemain Bersamaan):</strong><br>
    - Kedua pemain dapat melakukan transaksi kapan saja secara bersamaan dengan menekan tombol <strong>Transaksi</strong>.<br>
    - Pop-up transaksi dan aksi aset otomatis menyesuaikan arah posisi duduk (Pemain 1 di bawah, Pemain 2 di atas).<br>
@@ -705,10 +701,7 @@
                 modalBox.classList.remove('flipped-container');
             }
 
-            // ==========================================
-            // TAMBAHAN: OPSI "Klaim Bonus Putaran"
-            // Diposisikan tepat DI ATAS list kota Jakarta
-            // ==========================================
+            // OPSI "Klaim Bonus Putaran" di atas list kota Jakarta
             let bonusRowDiv = document.createElement('div');
             bonusRowDiv.className = "bg-amber-50 border-2 border-amber-400 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
 
@@ -765,7 +758,6 @@
             let opponentIdx = requesterIdx === 0 ? 1 : 0;
             let requesterName = players[requesterIdx].name;
 
-            // Atur arah pop-up persetujuan pemain lawan (jika lawan adalah P2, balikkan kontainer modalnya)
             const approvalBox = document.getElementById('claim-approval-box');
             if (opponentIdx === 1) {
                 approvalBox.classList.add('flipped-container');
@@ -776,7 +768,6 @@
             document.getElementById('claim-approval-text').innerHTML = 
                 `<strong>${requesterName}</strong> ingin melakukan Klaim Bonus Putaran senilai <strong>Rp500.000</strong> dari Bank Central.<br><br>Setujui klaim bonus ini?`;
 
-            // Simpan data sementara siapa yang merequest
             window.pendingClaimRequester = requesterIdx;
             document.getElementById('claim-approval-modal').classList.remove('hidden');
         }
@@ -787,7 +778,6 @@
             let requester = players[requesterIdx];
 
             if (isApproved) {
-                // Berhak mendapatkan Rp500.000 dari Bank Central
                 requester.money += 500000;
                 playAudioEffect('sound-transaction');
                 updateUI();
@@ -839,7 +829,7 @@
                 btnContainer.innerHTML = `
                     <button onclick="executeBuyoutProperty()" class="w-full bg-[#16a34a] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-green-700 transition text-xs">Beli / Buyout (Rp${buyoutPrice.toLocaleString('id-ID')})</button>
                     <button onclick="executePayTax()" class="w-full bg-red-600 text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-700 transition text-xs">Bayar Pajak (Rp${taxAmount.toLocaleString('id-ID')})</button>
-                    <button onclick="openTransactionModal(${currentTransactionPlayer})" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-xs">Kembali</button>
+                    <button onclick="openTransactionModal(${currentTransactionPlayer})" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-700 transition text-xs">Kembali</button>
                 `;
             }
 
