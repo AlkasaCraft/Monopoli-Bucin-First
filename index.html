@@ -289,6 +289,22 @@
         </div>
     </div>
 
+    <!-- MODAL PILIHAN BEBAS DARI PENJARA -->
+    <div id="jail-choice-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+        <div id="jail-choice-box" class="bg-white rounded-2xl monopoly-border p-6 max-w-sm w-full text-center shadow-2xl space-y-4 transition-transform duration-300">
+            <div class="text-4xl">🚨</div>
+            <h3 class="text-xl font-black text-red-900">Bebas Dari Penjara</h3>
+            <div class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300 text-center">
+                Pilih cara untuk bebas dari penjara:
+            </div>
+            <div class="space-y-2 pt-1">
+                <button onclick="executeJailChoice('challenge')" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition text-xs">Terima Tantangan (Kartu Tantangan)</button>
+                <button onclick="executeJailChoice('pay')" class="w-full bg-[#dc2626] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition text-xs">Bayar Denda Penjara (Rp3.000.000)</button>
+                <button onclick="closeAllModals()" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-xs">Dapatkan Dadu Angka 6</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DETAIL AKSI ASET -->
     <div id="asset-action-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div id="asset-action-modal-box" class="bg-white rounded-2xl monopoly-border p-5 max-w-sm w-full text-center shadow-2xl space-y-3 transition-transform duration-300">
@@ -332,7 +348,7 @@
             { name: "Bandung", type: "property", price: 1000000, currentDisplayPrice: 1000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 250000 },
             { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
             { name: "Malang", type: "property", price: 1350000, currentDisplayPrice: 1350000, owner: null, buyoutCount: 0, houses: 0, housePrice: 300000 },
-            { name: "Stasiun", type: "station", price: 2500000, currentDisplayPrice: 2500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Stasiun", type: "station", price: 2000000, currentDisplayPrice: 2000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0 },
             { name: "Surabaya", type: "property", price: 1750000, currentDisplayPrice: 1750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 350000 },
             { name: "Jogjakarta", type: "property", price: 2200000, currentDisplayPrice: 2200000, owner: null, buyoutCount: 0, houses: 0, housePrice: 400000 },
             { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
@@ -346,7 +362,7 @@
             { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
             { name: "Balikpapan", type: "property", price: 5700000, currentDisplayPrice: 5700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 800000 },
             { name: "Banjarmasin", type: "property", price: 6700000, currentDisplayPrice: 6700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 900000 },
-            { name: "Bandara", type: "airport", price: 7000000, currentDisplayPrice: 7000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0 }, 
+            { name: "Bandara", type: "airport", price: 7500000, currentDisplayPrice: 7500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0 }, 
             { name: "Samarinda", type: "property", price: 7800000, currentDisplayPrice: 7800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1000000 },
             { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
             { name: "Manado", type: "property", price: 8900000, currentDisplayPrice: 8900000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1150000 },
@@ -575,27 +591,35 @@
             document.getElementById('transaction-modal').classList.add('hidden');
             document.getElementById('asset-action-modal').classList.add('hidden');
             document.getElementById('claim-approval-modal').classList.add('hidden');
+            document.getElementById('jail-choice-modal').classList.add('hidden');
             
             document.getElementById('modal-box').classList.remove('flipped-container');
             document.getElementById('transaction-modal-box').classList.remove('flipped-container');
             document.getElementById('asset-action-modal-box').classList.remove('flipped-container');
             document.getElementById('claim-approval-box').classList.remove('flipped-container');
+            document.getElementById('jail-choice-box').classList.remove('flipped-container');
         }
 
         function openGuideModal() {
             closeAllModals();
             let guideText = `
-<strong>📜 TATA CARA & ATURAN BERMAIN MONOPOLI BUCIN:</strong><br><br>
-1. <strong>Tujuan Permainan:</strong> Kumpulkan aset kota dan rumah terbanyak serta jaga saldo uangmu!<br><br>
-2. <strong>Pembelian Rumah:</strong><br>
-   - Rumah dapat dibeli sebanyak 1 - 3 rumah di setiap kota (kecuali Stasiun, Bandara, dan Penjara).<br>
-   - Syarat beli rumah: Pemain sudah memiliki kota tersebut <strong>DAN</strong> sudah menyelesaikan minimal 1 putaran (dilihat dari status klaim bonus putaran).<br><br>
-3. <strong>Sistem Buyout & Pajak:</strong><br>
-   - Buyout kota yang sudah memiliki rumah wajib dibeli seharga harga beli kota ditambah total harga rumah yang terpasang.<br>
-   - Pajak akan semakin mahal jika kota lawan sudah terisi banyak rumah.<br><br>
-4. <strong>Penjualan Aset:</strong><br>
-   - Jual kota ke Bank Central dipotong 10%.<br>
-   - Jual rumah dikembalikan dengan harga yang sama saat dibeli.<br>
+<strong>📜 PANDUAN BERMAIN & ATURAN LENGKAP MONOPOLI BUCIN:</strong><br><br>
+1. <strong>Tujuan Permainan</strong><br>
+Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo agar tidak habis.<br><br><br>
+2. <strong>Aset & Rumah</strong><br>
+- <strong>Kota:</strong> Dapat diisi 1–3 rumah jika pemain sudah memiliki kota tersebut dan menyelesaikan minimal 1 putaran (klaim bonus).<br><br>
+- <strong>Stasiun & Bandara:</strong> Aset khusus yang dapat dibeli kepemilikannya tanpa bisa dibangun rumah.<br><br><br>
+3. <strong>Mobilitas Khusus Aset Stasiun & Bandara</strong><br>
+- <strong>Bandara:</strong> Jika pemain memiliki dan <strong>berada di kotak</strong> Bandara miliknya sendiri, pemain dapat menggunakan fasilitas penerbangan untuk pergi terbang langsung ke kota lain.<br><br>
+- <strong>Stasiun:</strong> Jika pemain memiliki dan <strong>berada di kotak</strong> Stasiun miliknya sendiri, pemain dapat menggunakan fasilitas perjalanan kereta untuk pergi ke pilihan kota/kotak berikut: Jakarta, Bogor, Bandung, Surabaya, Malang, Jogjakarta, Kotak Kartu Kesempatan, atau Kotak Kartu Tantangan.<br><br><br>
+4. <strong>Sistem Buyout & Pajak</strong><br>
+- <strong>Buyout:</strong> Mengambil alih aset atau kota milik lawan akan menaikkan nilai aset tersebut.<br><br>
+- <strong>Pajak:</strong> Pajak kota dihitung dari harga dasar ditambah bonus rumah, sedangkan pajak Stasiun dan Bandara mengikuti tarif tetap aset khusus.<br><br><br>
+5. <strong>Kebangkrutan (Bangkrut / Kalah)</strong><br>
+- Apabila pemain tidak memiliki saldo/uang yang cukup untuk membayar pajak kepada lawan atau melakukan <em>buyout</em> aset lawan, maka pemain tersebut dinyatakan <strong>Bangkrut / Kalah</strong> dalam permainan.<br><br><br>
+6. <strong>Aturan Penjara & Fitur Lainnya</strong><br>
+- Saat masuk penjara, pemain dapat memilih bebas melalui Kartu Tantangan, membayar denda Rp3.000.000, atau memilih opsi 'Dapatkan Dadu Angka 6'.<br><br>
+- Jual aset ke Bank Central dikenakan potongan 10%, sedangkan penjualan rumah dikembalikan dengan harga penuh sesuai saat dibeli.
             `;
             showPopup(0, "📖 PANDUAN BERMAIN", guideText, "📖");
         }
@@ -625,7 +649,7 @@
             let tbody = document.getElementById(tbodyId);
             tbody.innerHTML = '';
 
-            let ownedProperties = tiles.filter(t => t.type === 'property' && t.owner === playerIdx);
+            let ownedProperties = tiles.filter(t => (t.type === 'property' || t.type === 'station' || t.type === 'airport') && t.owner === playerIdx);
 
             if (ownedProperties.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="2" class="text-center text-red-200 italic">Belum ada</td></tr>`;
@@ -640,9 +664,15 @@
                 tdName.className = "py-0.5 pr-1 font-medium text-red-100 truncate max-w-[90px]";
                 
                 let houseBadge = '';
-                if (prop.houses === 1) houseBadge = ' 🏠';
-                else if (prop.houses === 2) houseBadge = ' 🏠🏠';
-                else if (prop.houses >= 3) houseBadge = ' 🏠🏠🏠';
+                if (prop.type === 'property') {
+                    if (prop.houses === 1) houseBadge = ' 🏠';
+                    else if (prop.houses === 2) houseBadge = ' 🏠🏠';
+                    else if (prop.houses >= 3) houseBadge = ' 🏠🏠🏠';
+                } else if (prop.type === 'station') {
+                    houseBadge = ' 🚂';
+                } else if (prop.type === 'airport') {
+                    houseBadge = ' ✈️';
+                }
 
                 tdName.innerText = prop.name + houseBadge;
 
@@ -736,7 +766,7 @@
             document.getElementById('card-modal').classList.remove('hidden');
         }
 
-        // --- TRANSAKSI ASET / KOTA ---
+        // --- TRANSAKSI ASET / KOTA / STASIUN / BANDARA ---
         function openTransactionModal(playerIdx) {
             closeAllModals();
             currentTransactionPlayer = playerIdx;
@@ -750,7 +780,7 @@
                 modalBox.classList.remove('flipped-container');
             }
 
-            // OPSI "Klaim Bonus Putaran"
+            // OPSI 1: "Klaim Bonus Putaran"
             let bonusRowDiv = document.createElement('div');
             bonusRowDiv.className = "bg-amber-50 border-2 border-amber-400 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
 
@@ -767,10 +797,27 @@
             bonusRowDiv.appendChild(claimBtn);
             container.appendChild(bonusRowDiv);
 
-            // Daftar properti kota
-            const propertyTiles = tiles.filter(t => t.type === 'property');
+            // OPSI 2: "Bebas Dari Penjara" (Tema Warna Merah)
+            let jailRowDiv = document.createElement('div');
+            jailRowDiv.className = "bg-red-50 border-2 border-red-500 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
 
-            propertyTiles.forEach(tile => {
+            let jailNameSpan = document.createElement('span');
+            jailNameSpan.className = "font-black text-red-900 text-xs truncate mr-2 flex items-center space-x-1";
+            jailNameSpan.innerHTML = `🚨 Bebas Dari Penjara`;
+
+            let jailBtn = document.createElement('button');
+            jailBtn.className = "bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0";
+            jailBtn.innerText = "Pilih";
+            jailBtn.onclick = () => openJailChoiceModal(currentTransactionPlayer);
+
+            jailRowDiv.appendChild(jailNameSpan);
+            jailRowDiv.appendChild(jailBtn);
+            container.appendChild(jailRowDiv);
+
+            // Daftar aset (Properti Kota, Stasiun, dan Bandara)
+            const tradeableTiles = tiles.filter(t => t.type === 'property' || t.type === 'station' || t.type === 'airport');
+
+            tradeableTiles.forEach(tile => {
                 let actualIndex = tiles.indexOf(tile);
                 let rowDiv = document.createElement('div');
                 rowDiv.className = "bg-white border-2 border-red-200 rounded-xl p-2.5 flex items-center justify-between shadow-sm";
@@ -778,12 +825,18 @@
                 let nameSpan = document.createElement('span');
                 nameSpan.className = "font-black text-red-900 text-sm truncate mr-2";
                 
-                let houseInfo = '';
-                if (tile.houses === 1) houseInfo = ' (🏠)';
-                else if (tile.houses === 2) houseInfo = ' (🏠🏠)';
-                else if (tile.houses >= 3) houseInfo = ' (🏠🏠🏠)';
+                let infoSuffix = '';
+                if (tile.type === 'property') {
+                    if (tile.houses === 1) infoSuffix = ' (🏠)';
+                    else if (tile.houses === 2) infoSuffix = ' (🏠🏠)';
+                    else if (tile.houses >= 3) infoSuffix = ' (🏠🏠🏠)';
+                } else if (tile.type === 'station') {
+                    infoSuffix = ' (🚂 Stasiun)';
+                } else if (tile.type === 'airport') {
+                    infoSuffix = ' (✈️ Bandara)';
+                }
 
-                nameSpan.innerText = tile.name + houseInfo;
+                nameSpan.innerText = tile.name + infoSuffix;
 
                 let btnColorClass = "bg-gray-400 hover:bg-gray-500 text-white";
                 if (tile.owner !== null) {
@@ -805,6 +858,39 @@
             });
 
             document.getElementById('transaction-modal').classList.remove('hidden');
+        }
+
+        // --- FITUR BEBAS DARI PENJARA ---
+        function openJailChoiceModal(playerIdx) {
+            closeAllModals();
+            currentTransactionPlayer = playerIdx;
+            const jailBox = document.getElementById('jail-choice-box');
+            if (playerIdx === 1) {
+                jailBox.classList.add('flipped-container');
+            } else {
+                jailBox.classList.remove('flipped-container');
+            }
+            document.getElementById('jail-choice-modal').classList.remove('hidden');
+        }
+
+        function executeJailChoice(choiceType) {
+            closeAllModals();
+            let playerIdx = currentTransactionPlayer;
+            let player = players[playerIdx];
+
+            if (choiceType === 'challenge') {
+                triggerCardPopup(playerIdx, 'challenge');
+            } else if (choiceType === 'pay') {
+                let dendaAmount = 3000000;
+                if (player.money >= dendaAmount) {
+                    player.money -= dendaAmount;
+                    playAudioEffect('sound-transaction');
+                    updateUI();
+                    showPopup(playerIdx, "🚨 BEBAS DARI PENJARA", `${player.name} berhasil membayar denda penjara sebesar <strong>Rp3.000.000</strong> ke Bank Central dan kini bebas!`, "🚨");
+                } else {
+                    showPopup(playerIdx, "⚠️ SALDO KURANG (BANGKRUT)", `${player.name} tidak memiliki cukup uang untuk membayar denda penjara Rp3.000.000 dan dinyatakan <strong>Bangkrut / Kalah</strong>!`, "💀");
+                }
+            }
         }
 
         // --- FITUR KLAIM BONUS PUTARAN & PERSETUJUAN LAWAN ---
@@ -862,12 +948,17 @@
             let ownerText = "Bank Central";
             if (tile.owner !== null) {
                 let houseSymbolStr = '';
-                if (tile.houses === 1) houseSymbolStr = '🏠';
-                else if (tile.houses === 2) houseSymbolStr = '🏠🏠';
-                else if (tile.houses >= 3) houseSymbolStr = '🏠🏠🏠';
-                else houseSymbolStr = '0';
+                if (tile.type === 'property') {
+                    if (tile.houses === 1) houseSymbolStr = ' 🏠';
+                    else if (tile.houses === 2) houseSymbolStr = ' 🏠🏠';
+                    else if (tile.houses >= 3) houseSymbolStr = ' 🏠🏠🏠';
+                } else if (tile.type === 'station') {
+                    houseSymbolStr = ' 🚂';
+                } else if (tile.type === 'airport') {
+                    houseSymbolStr = ' ✈️';
+                }
 
-                ownerText = `${players[tile.owner].name} (${houseSymbolStr}/3)`;
+                ownerText = `${players[tile.owner].name}${houseSymbolStr}`;
             }
             document.getElementById('action-city-owner').innerText = ownerText;
 
@@ -875,24 +966,31 @@
             btnContainer.innerHTML = '';
 
             if (tile.owner === null) {
+                let buyLabel = tile.type === 'property' ? 'Beli Kota' : (tile.type === 'station' ? 'Beli Stasiun' : 'Beli Bandara');
                 btnContainer.innerHTML = `
-                    <button onclick="executeBuyProperty()" class="w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-sm">Beli Kota (Rp${tile.price.toLocaleString('id-ID')})</button>
+                    <button onclick="executeBuyProperty()" class="w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-sm">${buyLabel} (Rp${tile.price.toLocaleString('id-ID')})</button>
                     <button onclick="openTransactionModal(${currentTransactionPlayer})" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-sm">Kembali</button>
                 `;
             } else if (tile.owner === currentTransactionPlayer) {
-                let sellCityPrice = Math.round(tile.price * 0.90);
-                let sellHousePrice = tile.houses * tile.housePrice;
-                let totalSellReturn = sellCityPrice + sellHousePrice;
-
+                let sellPrice = Math.round(tile.price * 0.90);
+                let totalSellReturn = sellPrice;
                 let buildHouseBtnHtml = '';
-                if (tile.houses < 3) {
-                    if (player.hasCompletedFirstRound) {
-                        buildHouseBtnHtml = `<button onclick="executeBuyHouse()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition text-xs">Bangun Rumah (Rp${tile.housePrice.toLocaleString('id-ID')}) [${tile.houses}/3]</button>`;
+
+                if (tile.type === 'property') {
+                    let sellHousePrice = tile.houses * tile.housePrice;
+                    totalSellReturn += sellHousePrice;
+
+                    if (tile.houses < 3) {
+                        if (player.hasCompletedFirstRound) {
+                            buildHouseBtnHtml = `<button onclick="executeBuyHouse()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition text-xs">Bangun Rumah (Rp${tile.housePrice.toLocaleString('id-ID')}) [${tile.houses}/3]</button>`;
+                        } else {
+                            buildHouseBtnHtml = `<div class="bg-amber-100 border border-amber-300 text-amber-900 text-[11px] p-2 rounded-xl text-center font-bold">⚠️ Selesaikan 1 putaran & klaim bonus untuk bangun rumah!</div>`;
+                        }
                     } else {
-                        buildHouseBtnHtml = `<div class="bg-amber-100 border border-amber-300 text-amber-900 text-[11px] p-2 rounded-xl text-center font-bold">⚠️ Selesaikan 1 putaran & klaim bonus untuk bangun rumah!</div>`;
+                        buildHouseBtnHtml = `<div class="bg-gray-100 text-gray-600 text-[11px] p-2 rounded-xl text-center font-bold">🏠 Rumah Penuh (Maksimal 3 Rumah)</div>`;
                     }
                 } else {
-                    buildHouseBtnHtml = `<div class="bg-gray-100 text-gray-600 text-[11px] p-2 rounded-xl text-center font-bold">🏠 Rumah Penuh (Maksimal 3 Rumah)</div>`;
+                    buildHouseBtnHtml = `<div class="bg-gray-100 text-gray-600 text-[11px] p-2 rounded-xl text-center font-bold">ℹ️ Aset Khusus (Tidak Dapat Dibangun Rumah)</div>`;
                 }
 
                 btnContainer.innerHTML = `
@@ -902,9 +1000,14 @@
                 `;
             } else {
                 let buyoutPrice = getBuyoutPrice(tile);
-                let baseTax = Math.round(tile.price * 0.10);
-                let houseTaxBonus = tile.houses * Math.round(tile.price * 0.20);
-                let totalTax = baseTax + houseTaxBonus;
+                let totalTax = 0;
+                if (tile.type === 'property') {
+                    let baseTax = Math.round(tile.price * 0.10);
+                    let houseTaxBonus = tile.houses * Math.round(tile.price * 0.20);
+                    totalTax = baseTax + houseTaxBonus;
+                } else {
+                    totalTax = Math.round(tile.price * 0.20);
+                }
 
                 btnContainer.innerHTML = `
                     <button onclick="executeBuyoutProperty()" class="w-full bg-[#16a34a] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-green-700 transition text-xs">Beli / Buyout (Rp${buyoutPrice.toLocaleString('id-ID')})</button>
@@ -931,7 +1034,7 @@
                 updateUI();
                 showPopup(currentTransactionPlayer, "🎉 BERHASIL", `${player.name} berhasil membeli ${tile.name} seharga Rp${tile.price.toLocaleString('id-ID')}!`, "🎉");
             } else {
-                showPopup(currentTransactionPlayer, "⚠️ SALDO KURANG", "Uang kamu tidak cukup untuk membeli aset ini!", "⚠️");
+                showPopup(currentTransactionPlayer, "⚠️ SALDO KURANG (BANGKRUT)", `${player.name} tidak memiliki cukup uang untuk membeli aset ini dan dinyatakan <strong>Bangkrut / Kalah</strong>!`, "💀");
             }
         }
 
@@ -956,9 +1059,11 @@
             let tile = tiles[activeSelectedTileIndex];
             let player = players[currentTransactionPlayer];
 
-            let sellCityPrice = Math.round(tile.price * 0.90);
-            let sellHousePrice = tile.houses * tile.housePrice;
-            let totalReturn = sellCityPrice + sellHousePrice;
+            let sellPrice = Math.round(tile.price * 0.90);
+            let totalReturn = sellPrice;
+            if (tile.type === 'property') {
+                totalReturn += (tile.houses * tile.housePrice);
+            }
 
             player.money += totalReturn;
             
@@ -970,7 +1075,7 @@
 
             playAudioEffect('sound-transaction');
             updateUI();
-            showPopup(currentTransactionPlayer, "💰 TERJUAL KE BANK", `${player.name} menjual ${tile.name} beserta seluruh rumah ke Bank Central seharga Rp${totalReturn.toLocaleString('id-ID')} (kota dipotong 10%, rumah harga sama).`, "💰");
+            showPopup(currentTransactionPlayer, "💰 TERJUAL KE BANK", `${player.name} menjual ${tile.name} ke Bank Central seharga Rp${totalReturn.toLocaleString('id-ID')} (dipotong 10%).`, "💰");
         }
 
         function executeBuyoutProperty() {
@@ -989,9 +1094,9 @@
 
                 playAudioEffect('sound-transaction');
                 updateUI();
-                showPopup(currentTransactionPlayer, "🏢 BUYOUT SUKSES", `${player.name} mengambil alih ${tile.name} (termasuk rumah di dalamnya) seharga Rp${buyoutPrice.toLocaleString('id-ID')}!`, "🏢");
+                showPopup(currentTransactionPlayer, "🏢 BUYOUT SUKSES", `${player.name} mengambil alih ${tile.name} seharga Rp${buyoutPrice.toLocaleString('id-ID')}!`, "🏢");
             } else {
-                showPopup(currentTransactionPlayer, "⚠️ SALDO KURANG", "Uang kamu kurang untuk melakukan buyout aset ini!", "⚠️");
+                showPopup(currentTransactionPlayer, "💀 BANGKRUT / KALAH", `${player.name} tidak memiliki cukup uang untuk melakukan buyout aset lawan senilai Rp${buyoutPrice.toLocaleString('id-ID')}! <strong>${player.name} dinyatakan Bangkrut dan Kalah!</strong>`, "💀");
             }
         }
 
@@ -1006,9 +1111,9 @@
 
                 playAudioEffect('sound-transaction');
                 updateUI();
-                showPopup(currentTransactionPlayer, "💸 PAJAK DIBAYAR", `${player.name} membayar pajak progresif sebesar Rp${totalTax.toLocaleString('id-ID')} kepada ${owner.name} karena kota memiliki ${tile.houses} rumah.`, "💸");
+                showPopup(currentTransactionPlayer, "💸 PAJAK DIBAYAR", `${player.name} membayar pajak sebesar Rp${totalTax.toLocaleString('id-ID')} kepada ${owner.name} untuk ${tile.name}.`, "💸");
             } else {
-                showPopup(currentTransactionPlayer, "⚠️ SALDO KURANG", "Uang kamu tidak cukup untuk membayar pajak!", "⚠️");
+                showPopup(currentTransactionPlayer, "💀 BANGKRUT / KALAH", `${player.name} tidak memiliki cukup uang untuk membayar pajak sebesar Rp${totalTax.toLocaleString('id-ID')} kepada ${owner.name}! <strong>${player.name} dinyatakan Bangkrut dan Kalah!</strong>`, "💀");
             }
         }
     </script>
