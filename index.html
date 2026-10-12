@@ -273,7 +273,7 @@
             <div id="modal-icon" class="text-4xl">🌟</div>
             <h3 id="modal-title" class="text-xl font-black text-red-900">INFORMASI</h3>
             <div id="modal-content" class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300 text-left max-h-60 overflow-y-auto"></div>
-            <div class="pt-1">
+            <div id="modal-action-buttons" class="space-y-2 pt-1">
                 <button id="modal-close-btn" onclick="closeAllModals()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs">Selesai ✨</button>
             </div>
         </div>
@@ -299,8 +299,7 @@
             </div>
             <div class="space-y-2 pt-1">
                 <button onclick="executeJailChoice('challenge')" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition text-xs">Terima Tantangan (Kartu Tantangan)</button>
-                <button onclick="executeJailChoice('pay')" class="w-full bg-[#dc2626] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition text-xs">Bayar Denda Penjara (Rp3.000.000)</button>
-                <button onclick="closeAllModals()" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-xs">Dapatkan Dadu Angka 6</button>
+                <button onclick="executeJailChoice('pay')" class="w-full bg-[#dc2626] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition text-xs">Bayar Denda Penjara (Rp2.000.000)</button>
             </div>
         </div>
     </div>
@@ -371,7 +370,7 @@
             { name: "Jayapura", type: "property", price: 12000000, currentDisplayPrice: 12000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1500000 }
         ];
 
-        // List Kartu Kesempatan (Tepat 10 List)
+        // List Kartu Kesempatan
         const chanceCards = [
             "Selamat kamu mendapatkan kalimat romantis dari [PARTNER]",
             "Selamat kamu berhak menentukan 1x tempat date berikutnya",
@@ -380,12 +379,14 @@
             "Selamat kamu berhak memberikan 1 panggilan sayang baru untuk [PARTNER]",
             "Selamat kamu mendapat pelukan hangat gratis dari [PARTNER] kapan pun kamu mau!",
             "Selamat kamu dibebaskan dari 1 kali hukuman atau tantangan berikutnya dari [PARTNER]!",
-            "Selamat kamu berhak meminta [PARTNER] untuk memijat pundakmu selama 5 menit.",
+            "Selamat kamu berhak meminta [PARTNER] untuk memijat pundakmu selama 1 menit.",
             "Selamat kamu mendapatkan 'Voucher Ngambek Sah' yang bisa digunakan kapan saja.",
-            "Selamat kamu berhak mendapatkan satu permintaan kecil yang wajib dituruti [PARTNER] hari ini!"
+            "Selamat kamu berhak mendapatkan satu permintaan kecil yang wajib dituruti [PARTNER] hari ini!",
+            "Selamat kamu mendapatkan undian dari bank central sebesar Rp1.000.000",
+            "Selamat kamu bebas pergi ke kota yang kamu mau"
         ];
 
-        // List Kartu Tantangan (Tepat 10 List)
+        // List Kartu Tantangan
         const challengeCards = [
             "Bikin [PARTNER] tertawa dalam waktu 30 detik",
             "Kamu wajib monyong selama 1 putaran!",
@@ -396,12 +397,17 @@
             "Spill 1 hal yang bikin kamu makin sayang sama [PARTNER].",
             "Sebut 3 hal yang bikin kamu jatuh cinta sama [PARTNER].",
             "Ganti Photo Profil kamu dengan foto [PARTNER]",
-            "Biarkan [PARTNER] merias wajahmu sesuka hatinya selama 2 menit."
+            "Biarkan [PARTNER] merias wajahmu sesuka hatinya selama 2 menit.",
+            "Mundur sebanyak 2 langkah",
+            "Maju sebanyak 3 langkah",
+            "Kamu harus membayar pajak sebesar Rp500.000",
+            "Kamu harus membayar tagihan listrik sebesar Rp200.000"
         ];
 
-        // State Sinkronisasi Kartu Terbuka Antar Pemain
+        // State Sinkronisasi Kartu Terbuka Antar Pemain & Posisi Pemain
         let usedChanceIndices = [];
         let usedChallengeIndices = [];
+        let playerPositions = [0, 0];
 
         const miniToastQuotes = [
             "💖 Sentuhan maut: Jangan lupa senyum ke doi sekarang!",
@@ -445,7 +451,7 @@
         }
 
         const speakerActiveSvg = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
-        const speakerMuteSvg = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+        const speakerMuteSvg = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
 
         const musicActiveSvg = '<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>';
         const musicMuteSvg = '<path d="M4.27 3L3 4.27 9 10.27V13.5c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4v-1.73l7.73 7.73L21 19.73 4.27 3zM14 7h4V3h-6v5.18l2 2V7z"/>';
@@ -605,20 +611,20 @@
             let guideText = `
 <strong>📜 PANDUAN BERMAIN & ATURAN LENGKAP MONOPOLI BUCIN:</strong><br><br>
 1. <strong>Tujuan Permainan</strong><br>
-Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo agar tidak habis.<br><br><br>
+Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo agar tidak habis.<br><br>
 2. <strong>Aset & Rumah</strong><br>
-- <strong>Kota:</strong> Dapat diisi 1–3 rumah jika pemain sudah memiliki kota tersebut dan menyelesaikan minimal 1 putaran (klaim bonus).<br><br>
-- <strong>Stasiun & Bandara:</strong> Aset khusus yang dapat dibeli kepemilikannya tanpa bisa dibangun rumah.<br><br><br>
+- <strong>Kota:</strong> Dapat diisi 1–3 rumah jika pemain sudah memiliki kota tersebut dan menyelesaikan minimal 1 putaran (klaim bonus).<br>
+- <strong>Stasiun & Bandara:</strong> Aset khusus yang dapat dibeli kepemilikannya tanpa bisa dibangun rumah.<br><br>
 3. <strong>Mobilitas Khusus Aset Stasiun & Bandara</strong><br>
-- <strong>Bandara:</strong> Jika pemain memiliki dan <strong>berada di kotak</strong> Bandara miliknya sendiri, pemain dapat menggunakan fasilitas penerbangan untuk pergi terbang langsung ke kota lain.<br><br>
-- <strong>Stasiun:</strong> Jika pemain memiliki dan <strong>berada di kotak</strong> Stasiun miliknya sendiri, pemain dapat menggunakan fasilitas perjalanan kereta untuk pergi ke pilihan kota/kotak berikut: Jakarta, Bogor, Bandung, Surabaya, Malang, Jogjakarta, Kotak Kartu Kesempatan, atau Kotak Kartu Tantangan.<br><br><br>
+- <strong>Bandara:</strong> Jika pemain memiliki dan <strong>berada di kotak</strong> Bandara miliknya sendiri, pemain dapat menggunakan fasilitas penerbangan untuk pergi terbang langsung ke kota lain.<br>
+- <strong>Stasiun:</strong> Jika pemain memiliki dan <strong>berada di kotak</strong> Stasiun miliknya sendiri, pemain dapat menggunakan fasilitas perjalanan kereta untuk pergi ke pilihan kota/kotak berikut: Jakarta, Bogor, Bandung, Surabaya, Malang, Jogjakarta, Kotak Kartu Kesempatan, atau Kotak Kartu Tantangan.<br><br>
 4. <strong>Sistem Buyout & Pajak</strong><br>
-- <strong>Buyout:</strong> Mengambil alih aset atau kota milik lawan akan menaikkan nilai aset tersebut.<br><br>
-- <strong>Pajak:</strong> Pajak kota dihitung dari harga dasar ditambah bonus rumah, sedangkan pajak Stasiun dan Bandara mengikuti tarif tetap aset khusus.<br><br><br>
+- <strong>Buyout:</strong> Mengambil alih aset atau kota milik lawan akan menaikkan nilai aset tersebut.<br>
+- <strong>Pajak:</strong> Pajak kota dihitung dari harga dasar ditambah bonus rumah, sedangkan pajak Stasiun dan Bandara mengikuti tarif tetap aset khusus.<br><br>
 5. <strong>Kebangkrutan (Bangkrut / Kalah)</strong><br>
-- Apabila pemain tidak memiliki saldo/uang yang cukup untuk membayar pajak kepada lawan atau melakukan <em>buyout</em> aset lawan, maka pemain tersebut dinyatakan <strong>Bangkrut / Kalah</strong> dalam permainan.<br><br><br>
+- Apabila pemain tidak memiliki saldo/uang yang cukup untuk membayar pajak kepada lawan atau melakukan <em>buyout</em> aset lawan, maka pemain tersebut dinyatakan <strong>Bangkrut / Kalah</strong> dalam permainan.<br><br>
 6. <strong>Aturan Penjara & Fitur Lainnya</strong><br>
-- Saat masuk penjara, pemain dapat memilih bebas melalui Kartu Tantangan, membayar denda Rp3.000.000, atau memilih opsi 'Dapatkan Dadu Angka 6'.<br><br>
+- Saat masuk penjara, pemain dapat memilih bebas melalui Kartu Tantangan atau membayar denda Rp2.000.000.<br>
 - Jual aset ke Bank Central dikenakan potongan 10%, sedangkan penjualan rumah dikembalikan dengan harga penuh sesuai saat dibeli.
             `;
             showPopup(0, "📖 PANDUAN BERMAIN", guideText, "📖");
@@ -696,7 +702,6 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             let sourceList = cardType === 'chance' ? chanceCards : challengeCards;
             let usedIndices = cardType === 'chance' ? usedChanceIndices : usedChallengeIndices;
 
-            // Jika semua kartu sudah pernah dibuka, reset daftarnya agar bisa diacak ulang
             if (usedIndices.length >= sourceList.length) {
                 if (cardType === 'chance') {
                     usedChanceIndices = [];
@@ -707,7 +712,6 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                 }
             }
 
-            // Cari indeks kartu yang belum pernah dibuka oleh pemain mana pun
             let availableIndices = [];
             for (let i = 0; i < sourceList.length; i++) {
                 if (!usedIndices.includes(i)) {
@@ -716,8 +720,6 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             }
 
             let randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-            
-            // Tandai kartu ini sebagai sudah dibuka
             usedIndices.push(randomIndex);
 
             let rawCardText = sourceList[randomIndex];
@@ -735,7 +737,7 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             let modalTitle = cardType === 'chance' ? "🌟 KARTU KESEMPATAN" : "🔥 KARTU TANTANGAN";
             let modalIcon = cardType === 'chance' ? "🌟" : "🔥";
 
-            showPopup(playerIdx, modalTitle, `Jalankan perintah ini:<br><br><strong>"${cardText}"</strong>`, modalIcon);
+            showCardPopup(playerIdx, modalTitle, cardText, modalIcon, randomIndex, cardType);
         }
 
         function playAudioEffect(elementId) {
@@ -752,9 +754,111 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             document.getElementById('modal-icon').innerText = icon;
             document.getElementById('modal-content').innerHTML = message;
             
-            let closeBtn = document.getElementById('modal-close-btn');
-            closeBtn.innerText = "Selesai ✨";
-            closeBtn.setAttribute("onclick", "closeAllModals()");
+            let actionContainer = document.getElementById('modal-action-buttons');
+            actionContainer.innerHTML = `<button id="modal-close-btn" onclick="closeAllModals()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs">Selesai ✨</button>`;
+
+            const modalBox = document.getElementById('modal-box');
+            if (playerIdx === 1) {
+                modalBox.classList.add('flipped-container');
+            } else {
+                modalBox.classList.remove('flipped-container');
+            }
+
+            document.getElementById('card-modal').classList.remove('hidden');
+        }
+
+        function showCardPopup(playerIdx, title, cardText, icon, cardIndex, cardType) {
+            closeAllModals();
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('modal-content').innerHTML = `Jalankan perintah ini:<br><br><strong>"${cardText}"</strong>`;
+            
+            let actionContainer = document.getElementById('modal-action-buttons');
+            actionContainer.innerHTML = '';
+
+            let player = players[playerIdx];
+
+            // Cek tombol khusus kartu kesempatan / tantangan
+            if (cardType === 'chance' && cardIndex === 10) {
+                // Undian bank central Rp1.000.000
+                let btn = document.createElement('button');
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
+                btn.innerText = "Klaim Undian";
+                btn.onclick = () => {
+                    player.money += 1000000;
+                    playAudioEffect('sound-transaction');
+                    updateUI();
+                    showPopup(playerIdx, "🎁 KLAIM UNDIAN BERHASIL", `${player.name} berhasil mengklaim undian dari Bank Central sebesar <strong>Rp1.000.000</strong>!`, "🎁");
+                };
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'chance' && cardIndex === 11) {
+                // Bebas pergi ke kota yang kamu mau -> Langsung tombol Selesai tanpa pop up daftar kota
+                let btn = document.createElement('button');
+                btn.className = "w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs";
+                btn.innerText = "Selesai ✨";
+                btn.onclick = () => closeAllModals();
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'challenge' && cardIndex === 10) {
+                // Mundur sebanyak 2 langkah -> Langsung update posisi & tutup modal
+                let btn = document.createElement('button');
+                btn.className = "w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs";
+                btn.innerText = "Selesai ✨";
+                btn.onclick = () => {
+                    playerPositions[playerIdx] = (playerPositions[playerIdx] - 2 + tiles.length) % tiles.length;
+                    closeAllModals();
+                };
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'challenge' && cardIndex === 11) {
+                // Maju sebanyak 3 langkah -> Langsung update posisi & tutup modal
+                let btn = document.createElement('button');
+                btn.className = "w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs";
+                btn.innerText = "Selesai ✨";
+                btn.onclick = () => {
+                    playerPositions[playerIdx] = (playerPositions[playerIdx] + 3) % tiles.length;
+                    closeAllModals();
+                };
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'challenge' && cardIndex === 12) {
+                // Membayar pajak sebesar Rp500.000 (masuk ke Bank Central)
+                let btn = document.createElement('button');
+                btn.className = "w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition text-xs";
+                btn.innerText = "Bayar Pajak";
+                btn.onclick = () => {
+                    let taxAmt = 500000;
+                    if (player.money >= taxAmt) {
+                        player.money -= taxAmt;
+                        playAudioEffect('sound-transaction');
+                        updateUI();
+                        showPopup(playerIdx, "💸 PAJAK DIBAYAR", `${player.name} membayar pajak sebesar <strong>Rp500.000</strong> ke Bank Central.`, "💸");
+                    } else {
+                        showPopup(playerIdx, "⚠️ SALDO KURANG (BANGKRUT)", `${player.name} tidak memiliki cukup uang untuk membayar pajak Rp500.000 dan dinyatakan <strong>Bangkrut / Kalah</strong>!`, "💀");
+                    }
+                };
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'challenge' && cardIndex === 13) {
+                // Membayar tagihan listrik sebesar Rp200.000 (masuk ke Bank Central)
+                let btn = document.createElement('button');
+                btn.className = "w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition text-xs";
+                btn.innerText = "Bayar Tagihan";
+                btn.onclick = () => {
+                    let billAmt = 200000;
+                    if (player.money >= billAmt) {
+                        player.money -= billAmt;
+                        playAudioEffect('sound-transaction');
+                        updateUI();
+                        showPopup(playerIdx, "⚡ TAGIHAN DIBAYAR", `${player.name} membayar tagihan listrik sebesar <strong>Rp200.000</strong> ke Bank Central.`, "⚡");
+                    } else {
+                        showPopup(playerIdx, "⚠️ SALDO KURANG (BANGKRUT)", `${player.name} tidak memiliki cukup uang untuk membayar tagihan listrik Rp200.000 dan dinyatakan <strong>Bangkrut / Kalah</strong>!`, "💀");
+                    }
+                };
+                actionContainer.appendChild(btn);
+            } else {
+                let defaultBtn = document.createElement('button');
+                defaultBtn.className = "w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs";
+                defaultBtn.innerText = "Selesai ✨";
+                defaultBtn.onclick = () => closeAllModals();
+                actionContainer.appendChild(defaultBtn);
+            }
 
             const modalBox = document.getElementById('modal-box');
             if (playerIdx === 1) {
@@ -779,6 +883,9 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             } else {
                 modalBox.classList.remove('flipped-container');
             }
+
+            let headerTitle = document.querySelector('#transaction-modal-box h3');
+            if(headerTitle) headerTitle.innerText = "Transaksi Aset / Kota";
 
             // OPSI 1: "Klaim Bonus Putaran"
             let bonusRowDiv = document.createElement('div');
@@ -881,14 +988,14 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             if (choiceType === 'challenge') {
                 triggerCardPopup(playerIdx, 'challenge');
             } else if (choiceType === 'pay') {
-                let dendaAmount = 3000000;
+                let dendaAmount = 2000000;
                 if (player.money >= dendaAmount) {
                     player.money -= dendaAmount;
                     playAudioEffect('sound-transaction');
                     updateUI();
-                    showPopup(playerIdx, "🚨 BEBAS DARI PENJARA", `${player.name} berhasil membayar denda penjara sebesar <strong>Rp3.000.000</strong> ke Bank Central dan kini bebas!`, "🚨");
+                    showPopup(playerIdx, "🚨 BEBAS DARI PENJARA", `${player.name} berhasil membayar denda penjara sebesar <strong>Rp2.000.000</strong> ke Bank Central dan kini bebas!`, "🚨");
                 } else {
-                    showPopup(playerIdx, "⚠️ SALDO KURANG (BANGKRUT)", `${player.name} tidak memiliki cukup uang untuk membayar denda penjara Rp3.000.000 dan dinyatakan <strong>Bangkrut / Kalah</strong>!`, "💀");
+                    showPopup(playerIdx, "⚠️ SALDO KURANG (BANGKRUT)", `${player.name} tidak memiliki cukup uang untuk membayar denda penjara Rp2.000.000 dan dinyatakan <strong>Bangkrut / Kalah</strong>!`, "💀");
                 }
             }
         }
@@ -965,9 +1072,12 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             let btnContainer = document.getElementById('action-buttons-container');
             btnContainer.innerHTML = '';
 
+            let balanceInfoHtml = `<div class="bg-amber-50 border border-amber-300 text-amber-900 text-xs py-1.5 px-3 rounded-xl text-center font-bold mb-1 shadow-sm">Saldo ${player.name} saat ini Rp${player.money.toLocaleString('id-ID')}</div>`;
+
             if (tile.owner === null) {
                 let buyLabel = tile.type === 'property' ? 'Beli Kota' : (tile.type === 'station' ? 'Beli Stasiun' : 'Beli Bandara');
                 btnContainer.innerHTML = `
+                    ${balanceInfoHtml}
                     <button onclick="executeBuyProperty()" class="w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-sm">${buyLabel} (Rp${tile.price.toLocaleString('id-ID')})</button>
                     <button onclick="openTransactionModal(${currentTransactionPlayer})" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-sm">Kembali</button>
                 `;
@@ -994,6 +1104,7 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                 }
 
                 btnContainer.innerHTML = `
+                    ${balanceInfoHtml}
                     ${buildHouseBtnHtml}
                     <button onclick="executeSellProperty()" class="w-full bg-red-600 text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-700 transition text-xs">Jual ke Bank Central (Rp${totalSellReturn.toLocaleString('id-ID')})</button>
                     <button onclick="openTransactionModal(${currentTransactionPlayer})" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-sm">Kembali</button>
@@ -1010,6 +1121,7 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                 }
 
                 btnContainer.innerHTML = `
+                    ${balanceInfoHtml}
                     <button onclick="executeBuyoutProperty()" class="w-full bg-[#16a34a] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-green-700 transition text-xs">Beli / Buyout (Rp${buyoutPrice.toLocaleString('id-ID')})</button>
                     <button onclick="executePayTax(${totalTax})" class="w-full bg-red-600 text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-700 transition text-xs">Bayar Pajak (Rp${totalTax.toLocaleString('id-ID')})</button>
                     <button onclick="openTransactionModal(${currentTransactionPlayer})" class="w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-sm">Kembali</button>
