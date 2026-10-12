@@ -190,12 +190,17 @@
 
                     <!-- Kolom Tombol Sisi Kanan Pemain 2 -->
                     <div class="flex flex-col justify-between h-[152px]">
-                        <div class="bg-white monopoly-border rounded-2xl p-2 shadow flex flex-col space-y-1.5 justify-center flex-1">
-                            <p class="text-[10px] font-bold text-gray-500 text-center uppercase">Buka Kartu</p>
-                            <button onclick="triggerCardPopup(1, 'chance')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-blue-700 transition">Kesempatan</button>
-                            <button onclick="triggerCardPopup(1, 'challenge')" class="w-full bg-[#dc2626] text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-700 transition">Tantangan</button>
+                        <div class="bg-white monopoly-border rounded-2xl p-1.5 shadow flex items-center justify-center flex-1">
+                            <div class="grid grid-cols-2 gap-1.5 w-full h-full">
+                                <button onclick="triggerCardPopup(1, 'challenge')" class="focus:outline-none transition-transform active:scale-95 flex items-center justify-center">
+                                    <img src="Kartu Tantangan.png" alt="Kartu Tantangan" class="w-full h-full object-contain hover:brightness-105 transition">
+                                </button>
+                                <button onclick="triggerCardPopup(1, 'chance')" class="focus:outline-none transition-transform active:scale-95 flex items-center justify-center">
+                                    <img src="Kartu Kesempatan.png" alt="Kartu Kesempatan" class="w-full h-full object-contain hover:brightness-105 transition">
+                                </button>
+                            </div>
                         </div>
-                        <button onclick="openTransactionModal(1)" class="w-full bg-[#16a34a] text-white font-black text-xs py-3 rounded-2xl shadow-lg hover:bg-green-700 transition mt-1.5">
+                        <button onclick="openTransactionModal(1)" class="w-full bg-[#16a34a] text-white font-black text-xs py-2.5 rounded-2xl shadow-lg hover:bg-green-700 transition mt-1.5">
                             Transaksi
                         </button>
                     </div>
@@ -253,12 +258,17 @@
 
                 <!-- Kolom Tombol Sisi Kanan Pemain 1 -->
                 <div class="flex flex-col justify-between h-[152px]">
-                    <div class="bg-white monopoly-border rounded-2xl p-2 shadow flex flex-col space-y-1.5 justify-center flex-1">
-                        <p class="text-[10px] font-bold text-gray-500 text-center uppercase">Buka Kartu</p>
-                        <button onclick="triggerCardPopup(0, 'chance')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-blue-700 transition">Kesempatan</button>
-                        <button onclick="triggerCardPopup(0, 'challenge')" class="w-full bg-[#dc2626] text-white font-bold py-2 rounded-xl text-xs shadow hover:bg-red-700 transition">Tantangan</button>
+                    <div class="bg-white monopoly-border rounded-2xl p-1.5 shadow flex items-center justify-center flex-1">
+                        <div class="grid grid-cols-2 gap-1.5 w-full h-full">
+                            <button onclick="triggerCardPopup(0, 'challenge')" class="focus:outline-none transition-transform active:scale-95 flex items-center justify-center">
+                                <img src="Kartu Tantangan.png" alt="Kartu Tantangan" class="w-full h-full object-contain hover:brightness-105 transition">
+                            </button>
+                            <button onclick="triggerCardPopup(0, 'chance')" class="focus:outline-none transition-transform active:scale-95 flex items-center justify-center">
+                                <img src="Kartu Kesempatan.png" alt="Kartu Kesempatan" class="w-full h-full object-contain hover:brightness-105 transition">
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="openTransactionModal(0)" class="w-full bg-[#16a34a] text-white font-black text-xs py-3 rounded-2xl shadow-lg hover:bg-green-700 transition mt-1.5">
+                    <button onclick="openTransactionModal(0)" class="w-full bg-[#16a34a] text-white font-black text-xs py-2.5 rounded-2xl shadow-lg hover:bg-green-700 transition mt-1.5">
                         Transaksi
                     </button>
                 </div>
