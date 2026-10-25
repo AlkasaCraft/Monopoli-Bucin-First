@@ -444,7 +444,7 @@
             <div class="text-4xl">🎁</div>
             <h3 class="text-xl font-black text-red-900">Persetujuan Klaim Bonus</h3>
             <div id="claim-approval-text" class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300 text-center">
-                Pemain lain meminta klaim Bonus Putaran senilai Rp500.000 dari Bank Central. Apakah Anda menyetujuinya?
+                Pemain lain meminta klaim Bonus Putaran Start senilai Rp500.000 dari Bank Central. Apakah Anda menyetujuinya?
             </div>
             <div class="grid grid-cols-2 gap-3 pt-2">
                 <button onclick="resolveClaimApproval(true)" class="w-full bg-[#16a34a] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-green-700 transition text-xs">Setujui Klaim</button>
@@ -468,34 +468,34 @@
         };
 
         const tiles = [
-            { name: "START", type: "start", price: 0, currentDisplayPrice: 0, buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
-            { name: "Jakarta", type: "property", price: 500000, currentDisplayPrice: 500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 150000, outlineColor: "#ea580c" },
-            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
-            { name: "Bogor", type: "property", price: 750000, currentDisplayPrice: 750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 200000, outlineColor: "#16a34a" },
-            { name: "Bandung", type: "property", price: 1000000, currentDisplayPrice: 1000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 250000, outlineColor: "#16a34a" },
-            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#db2777" },
-            { name: "Malang", type: "property", price: 1350000, currentDisplayPrice: 1350000, owner: null, buyoutCount: 0, houses: 0, housePrice: 300000, outlineColor: "#16a34a" },
-            { name: "Stasiun", type: "station", price: 2000000, currentDisplayPrice: 2000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#ea580c" },
-            { name: "Surabaya", type: "property", price: 1750000, currentDisplayPrice: 1750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 350000, outlineColor: "#db2777" },
-            { name: "Jogjakarta", type: "property", price: 2200000, currentDisplayPrice: 2200000, owner: null, buyoutCount: 0, houses: 0, housePrice: 400000, outlineColor: "#db2777" },
-            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#db2777" },
-            { name: "Denpasar", type: "property", price: 2700000, currentDisplayPrice: 2700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 450000, outlineColor: "#db2777" },
-            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
-            { name: "Lampung", type: "property", price: 3300000, currentDisplayPrice: 3300000, owner: null, buyoutCount: 0, houses: 0, housePrice: 500000, outlineColor: "#06b6d4" },
-            { name: "Penjara", type: "jail", price: 0, currentDisplayPrice: 0, buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#dc2626" },
-            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
-            { name: "Pekanbaru", type: "property", price: 4000000, currentDisplayPrice: 4000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 600000, outlineColor: "#06b6d4" },
-            { name: "Medan", type: "property", price: 4800000, currentDisplayPrice: 4800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 700000, outlineColor: "#06b6d4" },
-            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#db2777" },
-            { name: "Balikpapan", type: "property", price: 5700000, currentDisplayPrice: 5700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 800000, outlineColor: "#dc2626" },
-            { name: "Banjarmasin", type: "property", price: 6700000, currentDisplayPrice: 6700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 900000, outlineColor: "#dc2626" },
-            { name: "Bandara", type: "airport", price: 7500000, currentDisplayPrice: 7500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#06b6d4" }, 
-            { name: "Samarinda", type: "property", price: 7800000, currentDisplayPrice: 7800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1000000, outlineColor: "#dc2626" },
-            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#db2777" },
-            { name: "Manado", type: "property", price: 8900000, currentDisplayPrice: 8900000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1150000, outlineColor: "#ea580c" },
-            { name: "Makassar", type: "property", price: 10100000, currentDisplayPrice: 10100000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1300000, outlineColor: "#ea580c" },
-            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
-            { name: "Jayapura", type: "property", price: 12000000, currentDisplayPrice: 12000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1500000, outlineColor: "#7e22ce" }
+            { name: "START", type: "start", price: 0, currentDisplayPrice: 0, buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Jakarta", type: "property", price: 500000, currentDisplayPrice: 500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 150000 },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Bogor", type: "property", price: 750000, currentDisplayPrice: 750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 200000 },
+            { name: "Bandung", type: "property", price: 1000000, currentDisplayPrice: 1000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 250000 },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Malang", type: "property", price: 1350000, currentDisplayPrice: 1350000, owner: null, buyoutCount: 0, houses: 0, housePrice: 300000 },
+            { name: "Stasiun", type: "station", price: 2000000, currentDisplayPrice: 2000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Surabaya", type: "property", price: 1750000, currentDisplayPrice: 1750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 350000 },
+            { name: "Jogjakarta", type: "property", price: 2200000, currentDisplayPrice: 2200000, owner: null, buyoutCount: 0, houses: 0, housePrice: 400000 },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Denpasar", type: "property", price: 2700000, currentDisplayPrice: 2700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 450000 },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Lampung", type: "property", price: 3300000, currentDisplayPrice: 3300000, owner: null, buyoutCount: 0, houses: 0, housePrice: 500000 },
+            { name: "Penjara", type: "jail", price: 0, currentDisplayPrice: 0, buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Pekanbaru", type: "property", price: 4000000, currentDisplayPrice: 4000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 600000 },
+            { name: "Medan", type: "property", price: 4800000, currentDisplayPrice: 4800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 700000 },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Balikpapan", type: "property", price: 5700000, currentDisplayPrice: 5700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 800000 },
+            { name: "Banjarmasin", type: "property", price: 6700000, currentDisplayPrice: 6700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 900000 },
+            { name: "Bandara", type: "airport", price: 7500000, currentDisplayPrice: 7500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0 }, 
+            { name: "Samarinda", type: "property", price: 7800000, currentDisplayPrice: 7800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1000000 },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Manado", type: "property", price: 8900000, currentDisplayPrice: 8900000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1150000 },
+            { name: "Makassar", type: "property", price: 10100000, currentDisplayPrice: 10100000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1300000 },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0 },
+            { name: "Jayapura", type: "property", price: 12000000, currentDisplayPrice: 12000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1500000 }
         ];
 
         const chanceCards = [
@@ -1277,16 +1277,17 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             let headerTitle = document.querySelector('#transaction-modal-box h3');
             if(headerTitle) headerTitle.innerText = "Transaksi Aset / Kota";
 
+            // 1. Klaim Bonus Putaran Start
             let bonusRowDiv = document.createElement('div');
             bonusRowDiv.className = "bg-amber-50 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
-            bonusRowDiv.style.border = "2px solid #2563eb";
+            bonusRowDiv.style.border = "2px solid #800000";
 
             let bonusNameSpan = document.createElement('span');
-            bonusNameSpan.className = "font-black text-amber-900 text-xs truncate mr-2 flex items-center space-x-1";
-            bonusNameSpan.innerHTML = `🎁 Klaim Bonus Putaran`;
+            bonusNameSpan.className = "font-black text-red-900 text-xs truncate mr-2 flex items-center space-x-1";
+            bonusNameSpan.innerHTML = `🎁 Klaim Bonus Putaran Start`;
 
             let claimBtn = document.createElement('button');
-            claimBtn.className = "bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0";
+            claimBtn.className = "bg-[#16a34a] hover:bg-green-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0";
             claimBtn.innerText = "Klaim";
             claimBtn.onclick = () => requestClaimBonus(currentTransactionPlayer);
 
@@ -1294,9 +1295,10 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             bonusRowDiv.appendChild(claimBtn);
             container.appendChild(bonusRowDiv);
 
+            // 2. Bebas Dari Penjara
             let jailRowDiv = document.createElement('div');
-            jailRowDiv.className = "bg-red-50 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
-            jailRowDiv.style.border = "2px solid #dc2626";
+            jailRowDiv.className = "bg-red-50 rounded-xl p-2.5 flex items-center justify-between shadow-sm";
+            jailRowDiv.style.border = "2px solid #800000";
 
             let jailNameSpan = document.createElement('span');
             jailNameSpan.className = "font-black text-red-900 text-xs truncate mr-2 flex items-center space-x-1";
@@ -1311,13 +1313,23 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             jailRowDiv.appendChild(jailBtn);
             container.appendChild(jailRowDiv);
 
+            // 3. GARIS PEMISAH & JARAK LEBAR (~1 CM / mt-6 mb-4)
+            let dividerWrapper = document.createElement('div');
+            dividerWrapper.className = "mt-6 mb-4";
+            
+            let dividerLine = document.createElement('div');
+            dividerLine.className = "border-b-2 border-red-300/90";
+            dividerWrapper.appendChild(dividerLine);
+            container.appendChild(dividerWrapper);
+
+            // 4. Daftar Kota & Aset
             const tradeableTiles = tiles.filter(t => t.type === 'property' || t.type === 'station' || t.type === 'airport');
 
             tradeableTiles.forEach(tile => {
                 let actualIndex = tiles.indexOf(tile);
                 let rowDiv = document.createElement('div');
-                rowDiv.className = "bg-white rounded-xl p-2.5 flex items-center justify-between shadow-sm";
-                rowDiv.style.border = `2px solid ${tile.outlineColor || '#990000'}`;
+                rowDiv.className = "bg-white rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
+                rowDiv.style.border = "2px solid #800000"; // Selalu warna merah tua (#800000)
 
                 let nameSpan = document.createElement('span');
                 nameSpan.className = "font-black text-red-900 text-sm truncate mr-2";
@@ -1335,19 +1347,18 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
 
                 nameSpan.innerText = tile.name + infoSuffix;
 
-                let btnColorClass = "bg-gray-400 hover:bg-gray-500 text-white";
-                if (tile.owner !== null) {
-                    if (tile.owner === currentTransactionPlayer) {
-                        btnColorClass = "bg-[#16a34a] hover:bg-green-700 text-white";
-                    } else {
-                        btnColorClass = "bg-red-600 hover:bg-red-700 text-white";
-                    }
-                }
-
+                // FITUR BARU: Warna Tombol "Pilih" dinamis menyesuaikan warna tema pemain yang membeli
                 let selectBtn = document.createElement('button');
-                selectBtn.className = `${btnColorClass} font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0`;
                 selectBtn.innerText = "Pilih";
                 selectBtn.onclick = () => openAssetActionModal(actualIndex);
+
+                if (tile.owner !== null) {
+                    let ownerColorHex = colorThemes[players[tile.owner].colorKey].bg;
+                    selectBtn.className = "text-white font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0 hover:brightness-110";
+                    selectBtn.style.backgroundColor = ownerColorHex;
+                } else {
+                    selectBtn.className = "bg-gray-400 hover:bg-gray-500 text-white font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0";
+                }
 
                 rowDiv.appendChild(nameSpan);
                 rowDiv.appendChild(selectBtn);
@@ -1402,7 +1413,7 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             }
 
             document.getElementById('claim-approval-text').innerHTML = 
-                `<strong>${requesterName}</strong> ingin melakukan Klaim Bonus Putaran senilai <strong>Rp500.000</strong> dari Bank Central sekaligus membuka izin bangun rumah.<br><br>Setujui klaim bonus ini?`;
+                `<strong>${requesterName}</strong> ingin melakukan Klaim Bonus Putaran Start senilai <strong>Rp500.000</strong> dari Bank Central sekaligus membuka izin bangun rumah.<br><br>Setujui klaim bonus ini?`;
 
             window.pendingClaimRequester = requesterIdx;
             document.getElementById('claim-approval-modal').classList.remove('hidden');
