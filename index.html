@@ -44,40 +44,7 @@
             animation: toastFade 2.8s forwards ease-in-out;
         }
 
-        .game-slider {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-        .game-slider:focus {
-            outline: none;
-        }
-        .game-slider::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 18px;
-            cursor: pointer;
-            background: linear-gradient(to right, #f59e0b 0%, #f59e0b var(--value-percent, 100%), #78350f var(--value-percent, 100%), #78350f 100%);
-            border-radius: 9999px;
-            border: 2px solid #5a1e00;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .game-slider::-webkit-slider-thumb {
-            height: 28px;
-            width: 18px;
-            border-radius: 6px;
-            background: #16a34a;
-            cursor: pointer;
-            -webkit-appearance: none;
-            margin-top: -7px;
-            border: 2px solid #3f6212;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-            background-image: linear-gradient(to right, #ffffff 35%, transparent 35%, transparent 65%, #ffffff 65%);
-            background-size: 6px 12px;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        /* Kustomisasi scrollbar untuk kotak Aset */
+        /* Kustomisasi scrollbar untuk kotak Aset & Avatar */
         .asset-scroll-box::-webkit-scrollbar {
             width: 4px;
         }
@@ -91,7 +58,7 @@
         }
     </style>
 </head>
-<body class="bg-[#5a0000] text-gray-800 font-sans min-h-screen flex flex-col items-center justify-between p-2 relative max-w-md mx-auto">
+<body class="bg-[#f8efde] text-gray-800 font-sans min-h-screen flex flex-col items-center justify-between p-2 relative max-w-md mx-auto">
 
     <audio id="dice-sound" preload="auto">
         <source src="dice-roll.mp3" type="audio/mpeg">
@@ -122,39 +89,143 @@
         <p class="text-center text-sm text-gray-600 mb-6">Game Monopoli khusus buat kamu dan doi tersayang!</p>
         
         <div class="space-y-4">
+            <!-- Pemain 1 -->
             <div>
-                <label class="block text-sm font-bold text-red-900 mb-1">Nama Pemain 1:</label>
-                <input type="text" id="player1-name" placeholder="Tulis Nama" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
+                <div class="flex justify-between items-center mb-1">
+                    <label class="text-sm font-bold text-red-900">Nama Pemain 1:</label>
+                    <div class="flex space-x-3 pr-1">
+                        <span class="text-xs font-bold text-red-900">Avatar</span>
+                        <span class="text-xs font-bold text-red-900">Warna</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="player1-name" placeholder="Tulis Nama" class="flex-1 px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
+                    
+                    <!-- Kotak Pilih Avatar P1 -->
+                    <div onclick="openAvatarPickerModal(0)" id="p1-avatar-preview" class="w-10 h-10 rounded-xl bg-gray-100 cursor-pointer border-2 border-gray-300 shadow-md transition transform hover:scale-105 active:scale-95 flex items-center justify-center text-xl shrink-0">
+                        💖
+                    </div>
+
+                    <!-- Kotak Pilih Warna P1 -->
+                    <div onclick="openColorPickerModal(0)" id="p1-color-preview" class="w-10 h-10 rounded-xl bg-[#990000] cursor-pointer border-2 border-white shadow-md transition transform hover:scale-105 active:scale-95 flex items-center justify-center ring-2 ring-red-900 shrink-0">
+                    </div>
+                </div>
             </div>
+
+            <!-- Pemain 2 -->
             <div>
-                <label class="block text-sm font-bold text-red-900 mb-1">Nama Pemain 2:</label>
-                <input type="text" id="player2-name" placeholder="Tulis Nama" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
+                <div class="flex justify-between items-center mb-1">
+                    <label class="text-sm font-bold text-red-900">Nama Pemain 2:</label>
+                    <div class="flex space-x-3 pr-1">
+                        <span class="text-xs font-bold text-red-900">Avatar</span>
+                        <span class="text-xs font-bold text-red-900">Warna</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="player2-name" placeholder="Tulis Nama" class="flex-1 px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
+                    
+                    <!-- Kotak Pilih Avatar P2 -->
+                    <div onclick="openAvatarPickerModal(1)" id="p2-avatar-preview" class="w-10 h-10 rounded-xl bg-gray-100 cursor-pointer border-2 border-gray-300 shadow-md transition transform hover:scale-105 active:scale-95 flex items-center justify-center text-xl shrink-0">
+                        😍
+                    </div>
+
+                    <!-- Kotak Pilih Warna P2 -->
+                    <div onclick="openColorPickerModal(1)" id="p2-color-preview" class="w-10 h-10 rounded-xl bg-[#1d4ed8] cursor-pointer border-2 border-white shadow-md transition transform hover:scale-105 active:scale-95 flex items-center justify-center ring-2 ring-red-900 shrink-0">
+                    </div>
+                </div>
             </div>
             
-            <button onclick="startGame()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition">Mulai Permainan 🚀</button>
+            <!-- Tombol Mulai Permainan -->
+            <div class="pt-2">
+                <button onclick="startGame()" class="w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition">Mulai Permainan 🚀</button>
+            </div>
             
             <div class="border-t border-red-200 my-2"></div>
 
-            <button onclick="openGuideModal()" class="w-full bg-amber-600 text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-amber-700 transition text-sm">📖 Panduan Bermain</button>
-            
-            <div class="bg-amber-50/80 border-2 border-amber-300 rounded-2xl p-3.5 space-y-3 shadow-inner">
-                <div class="flex items-center space-x-3">
-                    <div id="sound-icon-btn" class="w-9 h-9 flex items-center justify-center bg-amber-600 rounded-xl shadow border border-amber-800 text-white cursor-pointer" onclick="toggleMuteSound()" title="Mute/Unmute Sound">
-                        <svg id="sound-svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                    </div>
-                    <div class="flex-1 relative flex items-center">
-                        <input type="range" id="sound-slider" class="game-slider" min="0" max="1" step="0.05" value="1" oninput="onSoundSliderInput(this)">
-                    </div>
+            <!-- Tombol Sound, Music, & Panduan Sejajar dalam 1 Baris -->
+            <div class="flex items-center space-x-2">
+                <div id="sound-icon-btn" class="w-10 h-10 flex items-center justify-center bg-amber-600 rounded-xl shadow border border-amber-800 text-white cursor-pointer hover:bg-amber-700 transition shrink-0" onclick="toggleMuteSound()" title="Mute/Unmute Sound">
+                    <svg id="sound-svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <div id="music-icon-btn" class="w-9 h-9 flex items-center justify-center bg-amber-600 rounded-xl shadow border border-amber-800 text-white cursor-pointer" onclick="toggleMuteMusic()" title="Mute/Unmute Music">
-                        <svg id="music-svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                    </div>
-                    <div class="flex-1 relative flex items-center">
-                        <input type="range" id="music-slider" class="game-slider" min="0" max="1" step="0.05" value="1" oninput="onMusicSliderInput(this)">
-                    </div>
+                <div id="music-icon-btn" class="w-10 h-10 flex items-center justify-center bg-amber-600 rounded-xl shadow border border-amber-800 text-white cursor-pointer hover:bg-amber-700 transition shrink-0" onclick="toggleMuteMusic()" title="Mute/Unmute Music">
+                    <svg id="music-svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                </div>
+                <button onclick="openGuideModal()" class="flex-1 bg-amber-600 text-white font-bold py-2.5 px-3 rounded-xl shadow-lg hover:bg-amber-700 transition text-sm text-center truncate">📖 Panduan Bermain</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP PILIH AVATAR (EMOTICON) DENGAN SCROLL & 36 VARIAN -->
+    <div id="avatar-picker-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
+        <div id="avatar-picker-box" class="bg-white rounded-2xl monopoly-border p-5 max-w-xs w-full text-center shadow-2xl space-y-3 transition-transform duration-300">
+            <h3 id="avatar-modal-title" class="text-lg font-black text-red-900">Pilih Avatar Emoticon</h3>
+            <p class="text-xs text-gray-500 font-medium">Pilih 1 emoticon kesukaanmu:</p>
+            
+            <!-- Grid Emoticon dengan Container Scroll -->
+            <div class="max-h-56 overflow-y-auto asset-scroll-box p-1">
+                <div class="grid grid-cols-4 gap-2.5 justify-items-center">
+                    <div onclick="selectModalAvatar('💖')" id="modal-avatar-💖" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💖</div>
+                    <div onclick="selectModalAvatar('😍')" id="modal-avatar-😍" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">😍</div>
+                    <div onclick="selectModalAvatar('🥰')" id="modal-avatar-🥰" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🥰</div>
+                    <div onclick="selectModalAvatar('😘')" id="modal-avatar-😘" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">😘</div>
+                    <div onclick="selectModalAvatar('💘')" id="modal-avatar-💘" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💘</div>
+                    <div onclick="selectModalAvatar('💝')" id="modal-avatar-💝" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💝</div>
+                    <div onclick="selectModalAvatar('💗')" id="modal-avatar-💗" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💗</div>
+                    <div onclick="selectModalAvatar('💓')" id="modal-avatar-💓" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💓</div>
+                    <div onclick="selectModalAvatar('💞')" id="modal-avatar-💞" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💞</div>
+                    <div onclick="selectModalAvatar('💕')" id="modal-avatar-💕" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💕</div>
+                    <div onclick="selectModalAvatar('💋')" id="modal-avatar-💋" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💋</div>
+                    <div onclick="selectModalAvatar('💌')" id="modal-avatar-💌" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💌</div>
+                    <div onclick="selectModalAvatar('🌹')" id="modal-avatar-🌹" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🌹</div>
+                    <div onclick="selectModalAvatar('🌷')" id="modal-avatar-🌷" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🌷</div>
+                    <div onclick="selectModalAvatar('🌸')" id="modal-avatar-🌸" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🌸</div>
+                    <div onclick="selectModalAvatar('👑')" id="modal-avatar-👑" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">👑</div>
+                    <div onclick="selectModalAvatar('🧸')" id="modal-avatar-🧸" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🧸</div>
+                    <div onclick="selectModalAvatar('✨')" id="modal-avatar-✨" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">✨</div>
+                    <div onclick="selectModalAvatar('😎')" id="modal-avatar-😎" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">😎</div>
+                    <div onclick="selectModalAvatar('🐱')" id="modal-avatar-🐱" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🐱</div>
+                    <div onclick="selectModalAvatar('🐰')" id="modal-avatar-🐰" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🐰</div>
+                    <div onclick="selectModalAvatar('🦊')" id="modal-avatar-🦊" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🦊</div>
+                    <div onclick="selectModalAvatar('🦄')" id="modal-avatar-🦄" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🦄</div>
+                    <div onclick="selectModalAvatar('🐼')" id="modal-avatar-🐼" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🐼</div>
+                    <div onclick="selectModalAvatar('🐨')" id="modal-avatar-🐨" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🐨</div>
+                    <div onclick="selectModalAvatar('🐯')" id="modal-avatar-🐯" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🐯</div>
+                    <div onclick="selectModalAvatar('🐥')" id="modal-avatar-🐥" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🐥</div>
+                    <div onclick="selectModalAvatar('🍓')" id="modal-avatar-🍓" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🍓</div>
+                    <div onclick="selectModalAvatar('🍫')" id="modal-avatar-🍫" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🍫</div>
+                    <div onclick="selectModalAvatar('🧁')" id="modal-avatar-🧁" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🧁</div>
+                    <div onclick="selectModalAvatar('🍩')" id="modal-avatar-🍩" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🍩</div>
+                    <div onclick="selectModalAvatar('🍦')" id="modal-avatar-🍦" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🍦</div>
+                    <div onclick="selectModalAvatar('🚀')" id="modal-avatar-🚀" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🚀</div>
+                    <div onclick="selectModalAvatar('💎')" id="modal-avatar-💎" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💎</div>
+                    <div onclick="selectModalAvatar('💍')" id="modal-avatar-💍" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">💍</div>
+                    <div onclick="selectModalAvatar('🔥')" id="modal-avatar-🔥" class="w-10 h-10 rounded-xl bg-red-50 cursor-pointer border-2 border-red-200 shadow flex items-center justify-center text-xl transition transform hover:scale-110">🔥</div>
                 </div>
             </div>
+
+            <button onclick="closeAvatarPickerModal()" class="w-full bg-[#16a34a] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-green-700 transition text-sm">Selesai ✨</button>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP PILIH WARNA PEMAIN -->
+    <div id="color-picker-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
+        <div id="color-picker-box" class="bg-white rounded-2xl monopoly-border p-6 max-w-xs w-full text-center shadow-2xl space-y-4 transition-transform duration-300">
+            <h3 id="color-modal-title" class="text-lg font-black text-red-900">Pilih Warna Pemain</h3>
+            <p class="text-xs text-gray-500 font-medium">Silakan pilih warna tema kesukaanmu:</p>
+            
+            <!-- Grid 2 Baris (4 pilihan warna per baris) -->
+            <div class="grid grid-cols-4 gap-3 py-2 justify-items-center">
+                <div onclick="selectModalColor('merah')" id="modal-color-merah" class="w-10 h-10 rounded-xl bg-[#990000] cursor-pointer border-2 border-white shadow transition transform hover:scale-110"></div>
+                <div onclick="selectModalColor('pink')" id="modal-color-pink" class="w-10 h-10 rounded-xl bg-[#db2777] cursor-pointer border-2 border-white shadow transition transform hover:scale-110"></div>
+                <div onclick="selectModalColor('kuning')" id="modal-color-kuning" class="w-10 h-10 rounded-xl bg-[#ca8a04] cursor-pointer border-2 border-white shadow transition transform hover:scale-110"></div>
+                <div onclick="selectModalColor('oren')" id="modal-color-oren" class="w-10 h-10 rounded-xl bg-[#ea580c] cursor-pointer border-2 border-white shadow transition transform hover:scale-110"></div>
+                <div onclick="selectModalColor('hijau')" id="modal-color-hijau" class="w-10 h-10 rounded-xl bg-[#15803d] cursor-pointer border-2 border-white shadow transition transform hover:scale-110"></div>
+                <div onclick="selectModalColor('biruMuda')" id="modal-color-biruMuda" class="w-10 h-10 rounded-xl bg-[#0284c7] cursor-pointer border-2 border-white shadow transition transform hover:scale-110"></div>
+                <div onclick="selectModalColor('biruTua')" id="modal-color-biruTua" class="w-10 h-10 rounded-xl bg-[#1d4ed8] cursor-pointer border-2 border-white shadow transition transform hover:scale-110"></div>
+                <div onclick="selectModalColor('ungu')" id="modal-color-ungu" class="w-10 h-10 rounded-xl bg-[#7e22ce] cursor-pointer border-2 border-white shadow transition transform hover:scale-110"></div>
+            </div>
+
+            <button onclick="closeColorPickerModal()" class="w-full bg-[#16a34a] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-green-700 transition text-sm">Selesai ✨</button>
         </div>
     </div>
 
@@ -164,12 +235,13 @@
         <!-- PEMAIN 2 (Flipped/Terbalik) -->
         <div id="p2-container" class="w-full bg-[#fae1df] monopoly-border rounded-3xl p-3 shadow-xl flex flex-col space-y-2">
             <div class="flipped-container flex flex-col space-y-2">
-                <div class="bg-white monopoly-border rounded-2xl p-2.5 shadow-inner">
+                <div id="p2-top-inner-box" class="bg-white monopoly-border rounded-2xl p-2.5 shadow-inner" style="border: 3px solid #1d4ed8;">
                     <div class="grid grid-cols-2 gap-2 items-center">
-                        <div class="bg-[#800000] text-white font-black text-sm py-2 px-3 rounded-xl text-center shadow truncate">
+                        <div id="p2-name-box" class="bg-[#1d4ed8] text-white font-black text-sm py-2 px-3 rounded-xl text-center shadow truncate flex items-center justify-center space-x-1.5">
+                            <span id="p2-display-avatar" class="text-base">😍</span>
                             <span id="p2-display-name">Pemain 2</span>
                         </div>
-                        <div class="bg-white border-2 border-[#800000] rounded-xl py-2 px-2 text-center text-xs font-extrabold text-[#800000] shadow-sm truncate">
+                        <div id="p2-money-box" class="bg-white border-2 border-[#1d4ed8] rounded-xl py-2 px-2 text-center text-xs font-extrabold text-[#1d4ed8] shadow-sm truncate">
                             Rp <span id="p2-money">10.000.000</span>
                         </div>
                     </div>
@@ -177,12 +249,12 @@
 
                 <div class="grid grid-cols-2 gap-2 items-stretch">
                     <!-- Kotak Aset / Kota Pemain 2 -->
-                    <div class="bg-[#800000] text-white rounded-2xl p-2.5 shadow flex flex-col justify-between h-[152px]">
+                    <div id="p2-asset-box" class="bg-[#1d4ed8] text-white rounded-2xl p-2.5 shadow flex flex-col justify-between h-[152px]">
                         <p class="text-xs font-bold mb-1.5 text-center shrink-0">Aset / Kota</p>
                         <div class="flex-1 overflow-y-auto asset-scroll-box pr-1">
                             <table class="w-full text-left text-[11px]">
                                 <tbody id="p2-properties-table">
-                                    <tr><td colspan="2" class="text-center text-red-200 italic">Belum ada</td></tr>
+                                    <tr><td colspan="2" class="text-center text-blue-200 italic">Belum ada</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -190,7 +262,7 @@
 
                     <!-- Kolom Tombol Sisi Kanan Pemain 2 -->
                     <div class="flex flex-col justify-between h-[152px]">
-                        <div class="bg-white monopoly-border rounded-2xl p-1.5 shadow flex items-center justify-center flex-1">
+                        <div id="p2-card-box" class="bg-white rounded-2xl p-1.5 shadow flex items-center justify-center flex-1" style="border: 3px solid #1d4ed8;">
                             <div class="grid grid-cols-2 gap-1.5 w-full h-full">
                                 <button onclick="triggerCardPopup(1, 'challenge')" class="focus:outline-none transition-transform active:scale-95 flex items-center justify-center">
                                     <img src="Kartu Tantangan.png" alt="Kartu Tantangan" class="w-full h-full object-contain hover:brightness-105 transition">
@@ -232,12 +304,13 @@
 
         <!-- PEMAIN 1 -->
         <div id="p1-container" class="w-full bg-[#fae1df] monopoly-border rounded-3xl p-3 shadow-xl flex flex-col space-y-2">
-            <div class="bg-white monopoly-border rounded-2xl p-2.5 shadow-inner">
+            <div id="p1-top-inner-box" class="bg-white monopoly-border rounded-2xl p-2.5 shadow-inner" style="border: 3px solid #990000;">
                 <div class="grid grid-cols-2 gap-2 items-center">
-                    <div class="bg-[#800000] text-white font-black text-sm py-2 px-3 rounded-xl text-center shadow truncate">
+                    <div id="p1-name-box" class="bg-[#990000] text-white font-black text-sm py-2 px-3 rounded-xl text-center shadow truncate flex items-center justify-center space-x-1.5">
+                        <span id="p1-display-avatar" class="text-base">💖</span>
                         <span id="p1-display-name">Pemain 1</span>
                     </div>
-                    <div class="bg-white border-2 border-[#800000] rounded-xl py-2 px-2 text-center text-xs font-extrabold text-[#800000] shadow-sm truncate">
+                    <div id="p1-money-box" class="bg-white border-2 border-[#990000] rounded-xl py-2 px-2 text-center text-xs font-extrabold text-[#990000] shadow-sm truncate">
                         Rp <span id="p1-money">10.000.000</span>
                     </div>
                 </div>
@@ -245,7 +318,7 @@
 
             <div class="grid grid-cols-2 gap-2 items-stretch">
                 <!-- Kotak Aset / Kota Pemain 1 -->
-                <div class="bg-[#800000] text-white rounded-2xl p-2.5 shadow flex flex-col justify-between h-[152px]">
+                <div id="p1-asset-box" class="bg-[#990000] text-white rounded-2xl p-2.5 shadow flex flex-col justify-between h-[152px]">
                     <p class="text-xs font-bold mb-1.5 text-center shrink-0">Aset / Kota</p>
                     <div class="flex-1 overflow-y-auto asset-scroll-box pr-1">
                         <table class="w-full text-left text-[11px]">
@@ -258,7 +331,7 @@
 
                 <!-- Kolom Tombol Sisi Kanan Pemain 1 -->
                 <div class="flex flex-col justify-between h-[152px]">
-                    <div class="bg-white monopoly-border rounded-2xl p-1.5 shadow flex items-center justify-center flex-1">
+                    <div id="p1-card-box" class="bg-white rounded-2xl p-1.5 shadow flex items-center justify-center flex-1" style="border: 3px solid #990000;">
                         <div class="grid grid-cols-2 gap-1.5 w-full h-full">
                             <button onclick="triggerCardPopup(0, 'challenge')" class="focus:outline-none transition-transform active:scale-95 flex items-center justify-center">
                                 <img src="Kartu Tantangan.png" alt="Kartu Tantangan" class="w-full h-full object-contain hover:brightness-105 transition">
@@ -280,11 +353,11 @@
     <!-- MODAL POPUP GAME / KARTU / PANDUAN -->
     <div id="card-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div id="modal-box" class="bg-white rounded-2xl monopoly-border p-6 max-w-sm w-full text-center shadow-2xl space-y-4 transition-transform duration-300">
-            <div id="modal-icon" class="text-4xl">🌟</div>
+            <div id="modal-icon" class="text-4xl">💗</div>
             <h3 id="modal-title" class="text-xl font-black text-red-900">INFORMASI</h3>
             <div id="modal-content" class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300 text-left max-h-60 overflow-y-auto"></div>
             <div id="modal-action-buttons" class="space-y-2 pt-1">
-                <button id="modal-close-btn" onclick="closeAllModals()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs">Selesai ✨</button>
+                <button id="modal-close-btn" onclick="closeAllModals()" class="w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs">Selesai ✨</button>
             </div>
         </div>
     </div>
@@ -349,38 +422,48 @@
     </div>
 
     <script>
+        const colorThemes = {
+            merah:     { name: "Merah",     bg: "#990000", border: "#660000", lightBg: "#fae1df" },
+            pink:      { name: "Pink",      bg: "#db2777", border: "#9d174d", lightBg: "#fce7f3" },
+            kuning:    { name: "Kuning",    bg: "#ca8a04", border: "#854d0e", lightBg: "#fef9c3" },
+            oren:      { name: "Oren",      bg: "#ea580c", border: "#9a3412", lightBg: "#ffedd5" },
+            hijau:     { name: "Hijau",     bg: "#15803d", border: "#14532d", lightBg: "#dcfce7" },
+            biruMuda:  { name: "Biru Muda", bg: "#0284c7", border: "#0369a1", lightBg: "#e0f2fe" },
+            biruTua:   { name: "Biru Tua",  bg: "#1d4ed8", border: "#1e40af", lightBg: "#dbeafe" },
+            ungu:      { name: "Ungu",      bg: "#7e22ce", border: "#581c87", lightBg: "#f3e8ff" }
+        };
+
         const tiles = [
-            { name: "START", type: "start", price: 0, currentDisplayPrice: 0, buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Jakarta", type: "property", price: 500000, currentDisplayPrice: 500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 150000 },
-            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Bogor", type: "property", price: 750000, currentDisplayPrice: 750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 200000 },
-            { name: "Bandung", type: "property", price: 1000000, currentDisplayPrice: 1000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 250000 },
-            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Malang", type: "property", price: 1350000, currentDisplayPrice: 1350000, owner: null, buyoutCount: 0, houses: 0, housePrice: 300000 },
-            { name: "Stasiun", type: "station", price: 2000000, currentDisplayPrice: 2000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Surabaya", type: "property", price: 1750000, currentDisplayPrice: 1750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 350000 },
-            { name: "Jogjakarta", type: "property", price: 2200000, currentDisplayPrice: 2200000, owner: null, buyoutCount: 0, houses: 0, housePrice: 400000 },
-            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Denpasar", type: "property", price: 2700000, currentDisplayPrice: 2700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 450000 },
-            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Lampung", type: "property", price: 3300000, currentDisplayPrice: 3300000, owner: null, buyoutCount: 0, houses: 0, housePrice: 500000 },
-            { name: "Penjara", type: "jail", price: 0, currentDisplayPrice: 0, buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Pekanbaru", type: "property", price: 4000000, currentDisplayPrice: 4000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 600000 },
-            { name: "Medan", type: "property", price: 4800000, currentDisplayPrice: 4800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 700000 },
-            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Balikpapan", type: "property", price: 5700000, currentDisplayPrice: 5700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 800000 },
-            { name: "Banjarmasin", type: "property", price: 6700000, currentDisplayPrice: 6700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 900000 },
-            { name: "Bandara", type: "airport", price: 7500000, currentDisplayPrice: 7500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0 }, 
-            { name: "Samarinda", type: "property", price: 7800000, currentDisplayPrice: 7800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1000000 },
-            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Manado", type: "property", price: 8900000, currentDisplayPrice: 8900000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1150000 },
-            { name: "Makassar", type: "property", price: 10100000, currentDisplayPrice: 10100000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1300000 },
-            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0 },
-            { name: "Jayapura", type: "property", price: 12000000, currentDisplayPrice: 12000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1500000 }
+            { name: "START", type: "start", price: 0, currentDisplayPrice: 0, buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
+            { name: "Jakarta", type: "property", price: 500000, currentDisplayPrice: 500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 150000, outlineColor: "#ea580c" },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
+            { name: "Bogor", type: "property", price: 750000, currentDisplayPrice: 750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 200000, outlineColor: "#16a34a" },
+            { name: "Bandung", type: "property", price: 1000000, currentDisplayPrice: 1000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 250000, outlineColor: "#16a34a" },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#db2777" },
+            { name: "Malang", type: "property", price: 1350000, currentDisplayPrice: 1350000, owner: null, buyoutCount: 0, houses: 0, housePrice: 300000, outlineColor: "#16a34a" },
+            { name: "Stasiun", type: "station", price: 2000000, currentDisplayPrice: 2000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#ea580c" },
+            { name: "Surabaya", type: "property", price: 1750000, currentDisplayPrice: 1750000, owner: null, buyoutCount: 0, houses: 0, housePrice: 350000, outlineColor: "#db2777" },
+            { name: "Jogjakarta", type: "property", price: 2200000, currentDisplayPrice: 2200000, owner: null, buyoutCount: 0, houses: 0, housePrice: 400000, outlineColor: "#db2777" },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#db2777" },
+            { name: "Denpasar", type: "property", price: 2700000, currentDisplayPrice: 2700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 450000, outlineColor: "#db2777" },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
+            { name: "Lampung", type: "property", price: 3300000, currentDisplayPrice: 3300000, owner: null, buyoutCount: 0, houses: 0, housePrice: 500000, outlineColor: "#06b6d4" },
+            { name: "Penjara", type: "jail", price: 0, currentDisplayPrice: 0, buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#dc2626" },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
+            { name: "Pekanbaru", type: "property", price: 4000000, currentDisplayPrice: 4000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 600000, outlineColor: "#06b6d4" },
+            { name: "Medan", type: "property", price: 4800000, currentDisplayPrice: 4800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 700000, outlineColor: "#06b6d4" },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#db2777" },
+            { name: "Balikpapan", type: "property", price: 5700000, currentDisplayPrice: 5700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 800000, outlineColor: "#dc2626" },
+            { name: "Banjarmasin", type: "property", price: 6700000, currentDisplayPrice: 6700000, owner: null, buyoutCount: 0, houses: 0, housePrice: 900000, outlineColor: "#dc2626" },
+            { name: "Bandara", type: "airport", price: 7500000, currentDisplayPrice: 7500000, owner: null, buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#06b6d4" }, 
+            { name: "Samarinda", type: "property", price: 7800000, currentDisplayPrice: 7800000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1000000, outlineColor: "#dc2626" },
+            { name: "Kesempatan", type: "chance", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#db2777" },
+            { name: "Manado", type: "property", price: 8900000, currentDisplayPrice: 8900000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1150000, outlineColor: "#ea580c" },
+            { name: "Makassar", type: "property", price: 10100000, currentDisplayPrice: 10100000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1300000, outlineColor: "#ea580c" },
+            { name: "Tantangan", type: "challenge", buyoutCount: 0, houses: 0, housePrice: 0, outlineColor: "#2563eb" },
+            { name: "Jayapura", type: "property", price: 12000000, currentDisplayPrice: 12000000, owner: null, buyoutCount: 0, houses: 0, housePrice: 1500000, outlineColor: "#7e22ce" }
         ];
 
-        // List Kartu Kesempatan
         const chanceCards = [
             "Selamat kamu mendapatkan kalimat romantis dari [PARTNER]",
             "Selamat kamu berhak menentukan 1x tempat date berikutnya",
@@ -396,7 +479,6 @@
             "Selamat kamu bebas pergi ke kota yang kamu mau"
         ];
 
-        // List Kartu Tantangan
         const challengeCards = [
             "Bikin [PARTNER] tertawa dalam waktu 30 detik",
             "Kamu wajib monyong selama 1 putaran!",
@@ -414,7 +496,6 @@
             "Kamu harus membayar tagihan listrik sebesar Rp200.000"
         ];
 
-        // State Sinkronisasi Kartu Terbuka Antar Pemain & Posisi Pemain
         let usedChanceIndices = [];
         let usedChallengeIndices = [];
         let playerPositions = [0, 0];
@@ -423,7 +504,7 @@
             "💖 Sentuhan maut: Jangan lupa senyum ke doi sekarang!",
             "✨ Alkasa Craft: Game seru buat nambah kemesraan kalian!",
             "🌹 Awas! Saldo berkurang, tapi cinta makin bertambah.",
-            "🔥 Siapa pemilik kota paling romantis hari ini?",
+            "🏆 Siapa pemilik kota paling romantis hari ini?",
             "💫 Tepuk tangan 3x buat pasangan paling seru!"
         ];
 
@@ -431,33 +512,103 @@
         let isBannerFlippedToPlayer2 = false;
 
         let players = [
-            { id: 0, name: "Pemain 1", money: 10000000, hasCompletedFirstRound: false },
-            { id: 1, name: "Pemain 2", money: 10000000, hasCompletedFirstRound: false }
+            { id: 0, name: "Pemain 1", money: 10000000, hasCompletedFirstRound: false, colorKey: 'merah', avatar: '💖' },
+            { id: 1, name: "Pemain 2", money: 10000000, hasCompletedFirstRound: false, colorKey: 'biruTua', avatar: '😍' }
         ];
 
-        let previousMusicVolume = 1;
-        let previousSoundVolume = 1;
+        let isSoundMuted = false;
+        let isMusicMuted = false;
         let currentTransactionPlayer = 0;
         let activeSelectedTileIndex = null;
         let toastTimeout = null;
+        let activeColorPickerPlayerIdx = null;
+        let activeAvatarPickerPlayerIdx = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.game-slider').forEach(slider => {
-                updateSliderProgress(slider);
-            });
             updateMusicIcon(1);
             updateSoundIcon(1);
-            
-            const currentSoundVol = document.getElementById('sound-slider').value;
-            document.getElementById('dice-sound').volume = currentSoundVol;
-            document.getElementById('sound-chance').volume = currentSoundVol;
-            document.getElementById('sound-challenge').volume = currentSoundVol;
-            document.getElementById('sound-transaction').volume = currentSoundVol;
+            updateColorPreviews();
+            updateAvatarPreviews();
         });
 
-        function updateSliderProgress(slider) {
-            const percent = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-            slider.style.setProperty('--value-percent', `${percent}%`);
+        function updateColorPreviews() {
+            let p1Preview = document.getElementById('p1-color-preview');
+            let p2Preview = document.getElementById('p2-color-preview');
+            if (p1Preview) p1Preview.style.backgroundColor = colorThemes[players[0].colorKey].bg;
+            if (p2Preview) p2Preview.style.backgroundColor = colorThemes[players[1].colorKey].bg;
+        }
+
+        function updateAvatarPreviews() {
+            let p1AvatarPrev = document.getElementById('p1-avatar-preview');
+            let p2AvatarPrev = document.getElementById('p2-avatar-preview');
+            if (p1AvatarPrev) p1AvatarPrev.innerText = players[0].avatar;
+            if (p2AvatarPrev) p2AvatarPrev.innerText = players[1].avatar;
+        }
+
+        function openColorPickerModal(playerIdx) {
+            activeColorPickerPlayerIdx = playerIdx;
+            document.getElementById('color-modal-title').innerText = `Pilih Warna ${players[playerIdx].name || 'Pemain ' + (playerIdx + 1)}`;
+            highlightSelectedModalColor(players[playerIdx].colorKey);
+            document.getElementById('color-picker-modal').classList.remove('hidden');
+        }
+
+        function closeColorPickerModal() {
+            document.getElementById('color-picker-modal').classList.add('hidden');
+        }
+
+        function selectModalColor(colorKey) {
+            if (activeColorPickerPlayerIdx !== null) {
+                players[activeColorPickerPlayerIdx].colorKey = colorKey;
+                updateColorPreviews();
+                highlightSelectedModalColor(colorKey);
+            }
+        }
+
+        function highlightSelectedModalColor(colorKey) {
+            const colorKeys = ['merah', 'pink', 'kuning', 'oren', 'hijau', 'biruMuda', 'biruTua', 'ungu'];
+            colorKeys.forEach(key => {
+                let el = document.getElementById(`modal-color-${key}`);
+                if (el) {
+                    if (key === colorKey) {
+                        el.classList.add('ring-2', 'ring-red-900', 'scale-110');
+                    } else {
+                        el.classList.remove('ring-2', 'ring-red-900', 'scale-110');
+                    }
+                }
+            });
+        }
+
+        function openAvatarPickerModal(playerIdx) {
+            activeAvatarPickerPlayerIdx = playerIdx;
+            document.getElementById('avatar-modal-title').innerText = `Pilih Avatar ${players[playerIdx].name || 'Pemain ' + (playerIdx + 1)}`;
+            highlightSelectedModalAvatar(players[playerIdx].avatar);
+            document.getElementById('avatar-picker-modal').classList.remove('hidden');
+        }
+
+        function closeAvatarPickerModal() {
+            document.getElementById('avatar-picker-modal').classList.add('hidden');
+        }
+
+        function selectModalAvatar(avatarEmoji) {
+            if (activeAvatarPickerPlayerIdx !== null) {
+                players[activeAvatarPickerPlayerIdx].avatar = avatarEmoji;
+                updateAvatarPreviews();
+                highlightSelectedModalAvatar(avatarEmoji);
+            }
+        }
+
+        function highlightSelectedModalAvatar(avatarEmoji) {
+            const avatarList = ['💖', '😍', '🥰', '😘', '💘', '💝', '💗', '💓', '💞', '💕', '💋', '💌', '🌹', '🌷', '🌸', '👑', '🧸', '✨', '😎', '🐱', '🐰', '🦊', '🦄', '🐼', '🐨', '🐯', '🐥', '🍓', '🍫', '🧁', '🍩', '🍦', '🚀', '💎', '💍', '🏆'];
+            avatarList.forEach(emoji => {
+                let el = document.getElementById(`modal-avatar-${emoji}`);
+                if (el) {
+                    if (emoji === avatarEmoji) {
+                        el.classList.add('ring-2', 'ring-red-900', 'scale-110', 'bg-red-100');
+                    } else {
+                        el.classList.remove('ring-2', 'ring-red-900', 'scale-110', 'bg-red-100');
+                    }
+                }
+            });
         }
 
         const speakerActiveSvg = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
@@ -469,77 +620,52 @@
         function updateSoundIcon(val) {
             const svg = document.getElementById('sound-svg');
             const centerSvg = document.getElementById('center-sound-svg');
-            if(svg) svg.innerHTML = parseFloat(val) === 0 ? speakerMuteSvg : speakerActiveSvg;
-            if(centerSvg) centerSvg.innerHTML = parseFloat(val) === 0 ? speakerMuteSvg : speakerActiveSvg;
+            if(svg) svg.innerHTML = val === 0 ? speakerMuteSvg : speakerActiveSvg;
+            if(centerSvg) centerSvg.innerHTML = val === 0 ? speakerMuteSvg : speakerActiveSvg;
         }
 
         function updateMusicIcon(val) {
             const svg = document.getElementById('music-svg');
             const centerSvg = document.getElementById('center-music-svg');
-            if(svg) svg.innerHTML = parseFloat(val) === 0 ? musicMuteSvg : musicActiveSvg;
-            if(centerSvg) centerSvg.innerHTML = parseFloat(val) === 0 ? musicMuteSvg : musicActiveSvg;
+            if(svg) svg.innerHTML = val === 0 ? musicMuteSvg : musicActiveSvg;
+            if(centerSvg) centerSvg.innerHTML = val === 0 ? musicMuteSvg : musicActiveSvg;
         }
 
-        function onSoundSliderInput(slider) {
-            const val = parseFloat(slider.value);
+        function toggleMuteSound() {
+            isSoundMuted = !isSoundMuted;
+            let vol = isSoundMuted ? 0 : 1;
+            
             const diceSound = document.getElementById('dice-sound');
             const soundChance = document.getElementById('sound-chance');
             const soundChallenge = document.getElementById('sound-challenge');
             const soundTransaction = document.getElementById('sound-transaction');
 
-            if(diceSound) diceSound.volume = val;
-            if(soundChance) soundChance.volume = val;
-            if(soundChallenge) soundChallenge.volume = val;
-            if(soundTransaction) soundTransaction.volume = val;
-            
-            if (val > 0) {
-                previousSoundVolume = val;
-                if(diceSound) {
-                    diceSound.currentTime = 0;
-                    diceSound.play().catch(e => console.log("Sound preview error:", e));
-                }
-            }
-            updateSliderProgress(slider);
-            updateSoundIcon(val);
-        }
+            if(diceSound) diceSound.volume = vol;
+            if(soundChance) soundChance.volume = vol;
+            if(soundChallenge) soundChallenge.volume = vol;
+            if(soundTransaction) soundTransaction.volume = vol;
 
-        function onMusicSliderInput(slider) {
-            const val = parseFloat(slider.value);
-            const bgm = document.getElementById('bgm');
-            if(bgm) bgm.volume = val;
-            if (val > 0) {
-                previousMusicVolume = val;
-                if (bgm && bgm.paused) {
-                    bgm.play().catch(e => console.log("BGM play error:", e));
-                }
-            } else {
-                if(bgm) bgm.pause();
-            }
-            updateSliderProgress(slider);
-            updateMusicIcon(val);
-        }
+            updateSoundIcon(vol);
 
-        function toggleMuteSound() {
-            const slider = document.getElementById('sound-slider');
-            let currentVal = slider ? parseFloat(slider.value) : (previousSoundVolume > 0 ? 0 : 1);
-            let newVal = currentVal > 0 ? 0 : (previousSoundVolume > 0 ? previousSoundVolume : 1);
-            if(slider) {
-                slider.value = newVal;
-                onSoundSliderInput(slider);
-            } else {
-                updateSoundIcon(newVal);
+            if (!isSoundMuted && diceSound) {
+                diceSound.currentTime = 0;
+                diceSound.play().catch(e => console.log("Sound preview error:", e));
             }
         }
 
         function toggleMuteMusic() {
-            const slider = document.getElementById('music-slider');
-            let currentVal = slider ? parseFloat(slider.value) : (previousMusicVolume > 0 ? 0 : 1);
-            let newVal = currentVal > 0 ? 0 : (previousMusicVolume > 0 ? previousMusicVolume : 1);
-            if(slider) {
-                slider.value = newVal;
-                onMusicSliderInput(slider);
-            } else {
-                updateMusicIcon(newVal);
+            isMusicMuted = !isMusicMuted;
+            let vol = isMusicMuted ? 0 : 1;
+            
+            const bgm = document.getElementById('bgm');
+            if(bgm) bgm.volume = vol;
+
+            updateMusicIcon(vol);
+
+            if (!isMusicMuted && bgm) {
+                bgm.play().catch(e => console.log("BGM play error:", e));
+            } else if (isMusicMuted && bgm) {
+                bgm.pause();
             }
         }
 
@@ -552,21 +678,84 @@
 
             document.getElementById('p1-display-name').innerText = players[0].name;
             document.getElementById('p2-display-name').innerText = players[1].name;
+            document.getElementById('p1-display-avatar').innerText = players[0].avatar;
+            document.getElementById('p2-display-avatar').innerText = players[1].avatar;
+
+            applyPlayerThemes();
 
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
 
             const bgm = document.getElementById('bgm');
-            const musicVal = document.getElementById('music-slider').value;
-            if(bgm) {
-                bgm.volume = parseFloat(musicVal);
-                if (parseFloat(musicVal) > 0) {
-                    bgm.play().catch(e => console.log("BGM autoplay restriction:", e));
-                }
+            if(bgm && !isMusicMuted) {
+                bgm.volume = 1;
+                bgm.play().catch(e => console.log("BGM autoplay restriction:", e));
             }
 
             startDynamicBannerRotation();
             updateUI();
+        }
+
+        function applyPlayerThemes() {
+            let p1Theme = colorThemes[players[0].colorKey];
+            let p1Container = document.getElementById('p1-container');
+            let p1TopInnerBox = document.getElementById('p1-top-inner-box');
+            let p1NameBox = document.getElementById('p1-name-box');
+            let p1MoneyBox = document.getElementById('p1-money-box');
+            let p1AssetBox = document.getElementById('p1-asset-box');
+            let p1CardBox = document.getElementById('p1-card-box');
+
+            if (p1Container) {
+                p1Container.style.backgroundColor = p1Theme.lightBg;
+                p1Container.style.borderColor = p1Theme.border;
+            }
+            if (p1TopInnerBox) {
+                p1TopInnerBox.style.border = `3px solid ${p1Theme.bg}`;
+            }
+            if (p1NameBox) {
+                p1NameBox.style.backgroundColor = p1Theme.bg;
+            }
+            if (p1MoneyBox) {
+                p1MoneyBox.style.borderColor = p1Theme.bg;
+                p1MoneyBox.style.color = p1Theme.bg;
+            }
+            if (p1AssetBox) {
+                p1AssetBox.style.backgroundColor = p1Theme.bg;
+            }
+            if (p1CardBox) {
+                p1CardBox.style.borderColor = p1Theme.bg;
+                p1CardBox.style.borderWidth = '3px';
+            }
+
+            let p2Theme = colorThemes[players[1].colorKey];
+            let p2Container = document.getElementById('p2-container');
+            let p2TopInnerBox = document.getElementById('p2-top-inner-box');
+            let p2NameBox = document.getElementById('p2-name-box');
+            let p2MoneyBox = document.getElementById('p2-money-box');
+            let p2AssetBox = document.getElementById('p2-asset-box');
+            let p2CardBox = document.getElementById('p2-card-box');
+
+            if (p2Container) {
+                p2Container.style.backgroundColor = p2Theme.lightBg;
+                p2Container.style.borderColor = p2Theme.border;
+            }
+            if (p2TopInnerBox) {
+                p2TopInnerBox.style.border = `3px solid ${p2Theme.bg}`;
+            }
+            if (p2NameBox) {
+                p2NameBox.style.backgroundColor = p2Theme.bg;
+            }
+            if (p2MoneyBox) {
+                p2MoneyBox.style.borderColor = p2Theme.bg;
+                p2MoneyBox.style.color = p2Theme.bg;
+            }
+            if (p2AssetBox) {
+                p2AssetBox.style.backgroundColor = p2Theme.bg;
+            }
+            if (p2CardBox) {
+                p2CardBox.style.borderColor = p2Theme.bg;
+                p2CardBox.style.borderWidth = '3px';
+            }
         }
 
         function startDynamicBannerRotation() {
@@ -608,6 +797,8 @@
             document.getElementById('asset-action-modal').classList.add('hidden');
             document.getElementById('claim-approval-modal').classList.add('hidden');
             document.getElementById('jail-choice-modal').classList.add('hidden');
+            document.getElementById('color-picker-modal').classList.add('hidden');
+            document.getElementById('avatar-picker-modal').classList.add('hidden');
             
             document.getElementById('modal-box').classList.remove('flipped-container');
             document.getElementById('transaction-modal-box').classList.remove('flipped-container');
@@ -702,7 +893,6 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             });
         }
 
-        // --- SISTEM ACAK KARTU KESEMPATAN & TANTANGAN SINKRON ANTAR PEMAIN ---
         function triggerCardPopup(playerIdx, cardType) {
             closeAllModals();
             
@@ -744,15 +934,15 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                 .replaceAll("[ME]", activePlayerName)
                 .replaceAll("[PARTNER]", opponentPlayerName);
 
-            let modalTitle = cardType === 'chance' ? "🌟 KARTU KESEMPATAN" : "🔥 KARTU TANTANGAN";
-            let modalIcon = cardType === 'chance' ? "🌟" : "🔥";
+            let modalTitle = cardType === 'chance' ? "KARTU KESEMPATAN" : "KARTU TANTANGAN";
+            let modalIcon = cardType === 'chance' ? "💗" : "🏆";
 
             showCardPopup(playerIdx, modalTitle, cardText, modalIcon, randomIndex, cardType);
         }
 
         function playAudioEffect(elementId) {
             const audioEl = document.getElementById(elementId);
-            if (audioEl) {
+            if (audioEl && !isSoundMuted) {
                 audioEl.currentTime = 0;
                 audioEl.play().catch(e => console.log("Audio effect play error:", e));
             }
@@ -764,8 +954,16 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             document.getElementById('modal-icon').innerText = icon;
             document.getElementById('modal-content').innerHTML = message;
             
+            // Reset styling outline & warna modal umum
+            document.getElementById('modal-box').style.border = "3px solid #660000";
+            document.getElementById('modal-title').style.color = "#990000";
+            let contentDiv = document.getElementById('modal-content');
+            contentDiv.style.backgroundColor = "#fef2f2";
+            contentDiv.style.borderColor = "#fca5a5";
+            contentDiv.style.color = "#990000";
+
             let actionContainer = document.getElementById('modal-action-buttons');
-            actionContainer.innerHTML = `<button id="modal-close-btn" onclick="closeAllModals()" class="w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs">Selesai ✨</button>`;
+            actionContainer.innerHTML = `<button id="modal-close-btn" onclick="closeAllModals()" class="w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs">Selesai ✨</button>`;
 
             const modalBox = document.getElementById('modal-box');
             if (playerIdx === 1) {
@@ -779,18 +977,37 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
 
         function showCardPopup(playerIdx, title, cardText, icon, cardIndex, cardType) {
             closeAllModals();
-            document.getElementById('modal-title').innerText = title;
+            let modalTitleEl = document.getElementById('modal-title');
+            let contentDiv = document.getElementById('modal-content');
+            let modalBox = document.getElementById('modal-box');
+
+            modalTitleEl.innerText = title;
             document.getElementById('modal-icon').innerText = icon;
-            document.getElementById('modal-content').innerHTML = `Jalankan perintah ini:<br><br><strong>"${cardText}"</strong>`;
+            contentDiv.innerHTML = `Jalankan perintah ini:<br><br><strong>"${cardText}"</strong>`;
             
+            // Terapkan kustomisasi warna khusus kartu:
+            // Kartu Kesempatan = Pink (#ff66c4)
+            // Kartu Tantangan = Biru (#5170ff)
+            if (cardType === 'chance') {
+                modalTitleEl.style.color = "#ff66c4";
+                contentDiv.style.backgroundColor = "#fdf2f8";
+                contentDiv.style.borderColor = "#f472b6";
+                contentDiv.style.color = "#831843";
+                modalBox.style.border = "3px solid #ff66c4";
+            } else {
+                modalTitleEl.style.color = "#5170ff";
+                contentDiv.style.backgroundColor = "#eef2ff";
+                contentDiv.style.borderColor = "#818cf8";
+                contentDiv.style.color = "#312e81";
+                modalBox.style.border = "3px solid #5170ff";
+            }
+
             let actionContainer = document.getElementById('modal-action-buttons');
             actionContainer.innerHTML = '';
 
             let player = players[playerIdx];
 
-            // Cek tombol khusus kartu kesempatan / tantangan
             if (cardType === 'chance' && cardIndex === 10) {
-                // Undian bank central Rp1.000.000
                 let btn = document.createElement('button');
                 btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
                 btn.innerText = "Klaim Undian";
@@ -798,20 +1015,18 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                     player.money += 1000000;
                     playAudioEffect('sound-transaction');
                     updateUI();
-                    showPopup(playerIdx, "🎁 KLAIM UNDIAN BERHASIL", `${player.name} berhasil mengklaim undian dari Bank Central sebesar <strong>Rp1.000.000</strong>!`, "🎁");
+                    showPopup(playerIdx, "KLAIM UNDIAN BERHASIL", `${player.name} berhasil mengklaim undian dari Bank Central sebesar <strong>Rp1.000.000</strong>!`, "🎁");
                 };
                 actionContainer.appendChild(btn);
             } else if (cardType === 'chance' && cardIndex === 11) {
-                // Bebas pergi ke kota yang kamu mau -> Langsung tombol Selesai tanpa pop up daftar kota
                 let btn = document.createElement('button');
-                btn.className = "w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs";
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
                 btn.innerText = "Selesai ✨";
                 btn.onclick = () => closeAllModals();
                 actionContainer.appendChild(btn);
             } else if (cardType === 'challenge' && cardIndex === 10) {
-                // Mundur sebanyak 2 langkah -> Langsung update posisi & tutup modal
                 let btn = document.createElement('button');
-                btn.className = "w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs";
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
                 btn.innerText = "Selesai ✨";
                 btn.onclick = () => {
                     playerPositions[playerIdx] = (playerPositions[playerIdx] - 2 + tiles.length) % tiles.length;
@@ -819,9 +1034,8 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                 };
                 actionContainer.appendChild(btn);
             } else if (cardType === 'challenge' && cardIndex === 11) {
-                // Maju sebanyak 3 langkah -> Langsung update posisi & tutup modal
                 let btn = document.createElement('button');
-                btn.className = "w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs";
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
                 btn.innerText = "Selesai ✨";
                 btn.onclick = () => {
                     playerPositions[playerIdx] = (playerPositions[playerIdx] + 3) % tiles.length;
@@ -829,7 +1043,6 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                 };
                 actionContainer.appendChild(btn);
             } else if (cardType === 'challenge' && cardIndex === 12) {
-                // Membayar pajak sebesar Rp500.000 (masuk ke Bank Central)
                 let btn = document.createElement('button');
                 btn.className = "w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition text-xs";
                 btn.innerText = "Bayar Pajak";
@@ -839,14 +1052,13 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                         player.money -= taxAmt;
                         playAudioEffect('sound-transaction');
                         updateUI();
-                        showPopup(playerIdx, "💸 PAJAK DIBAYAR", `${player.name} membayar pajak sebesar <strong>Rp500.000</strong> ke Bank Central.`, "💸");
+                        showPopup(playerIdx, "PAJAK DIBAYAR", `${player.name} membayar pajak sebesar <strong>Rp500.000</strong> ke Bank Central.`, "💸");
                     } else {
                         showPopup(playerIdx, "⚠️ SALDO KURANG (BANGKRUT)", `${player.name} tidak memiliki cukup uang untuk membayar pajak Rp500.000 dan dinyatakan <strong>Bangkrut / Kalah</strong>!`, "💀");
                     }
                 };
                 actionContainer.appendChild(btn);
             } else if (cardType === 'challenge' && cardIndex === 13) {
-                // Membayar tagihan listrik sebesar Rp200.000 (masuk ke Bank Central)
                 let btn = document.createElement('button');
                 btn.className = "w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition text-xs";
                 btn.innerText = "Bayar Tagihan";
@@ -856,7 +1068,7 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                         player.money -= billAmt;
                         playAudioEffect('sound-transaction');
                         updateUI();
-                        showPopup(playerIdx, "⚡ TAGIHAN DIBAYAR", `${player.name} membayar tagihan listrik sebesar <strong>Rp200.000</strong> ke Bank Central.`, "⚡");
+                        showPopup(playerIdx, "TAGIHAN DIBAYAR", `${player.name} membayar tagihan listrik sebesar <strong>Rp200.000</strong> ke Bank Central.`, "⚡");
                     } else {
                         showPopup(playerIdx, "⚠️ SALDO KURANG (BANGKRUT)", `${player.name} tidak memiliki cukup uang untuk membayar tagihan listrik Rp200.000 dan dinyatakan <strong>Bangkrut / Kalah</strong>!`, "💀");
                     }
@@ -864,13 +1076,12 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                 actionContainer.appendChild(btn);
             } else {
                 let defaultBtn = document.createElement('button');
-                defaultBtn.className = "w-full monopoly-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-800 transition text-xs";
+                defaultBtn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
                 defaultBtn.innerText = "Selesai ✨";
                 defaultBtn.onclick = () => closeAllModals();
                 actionContainer.appendChild(defaultBtn);
             }
 
-            const modalBox = document.getElementById('modal-box');
             if (playerIdx === 1) {
                 modalBox.classList.add('flipped-container');
             } else {
@@ -880,7 +1091,6 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             document.getElementById('card-modal').classList.remove('hidden');
         }
 
-        // --- TRANSAKSI ASET / KOTA / STASIUN / BANDARA ---
         function openTransactionModal(playerIdx) {
             closeAllModals();
             currentTransactionPlayer = playerIdx;
@@ -897,9 +1107,9 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             let headerTitle = document.querySelector('#transaction-modal-box h3');
             if(headerTitle) headerTitle.innerText = "Transaksi Aset / Kota";
 
-            // OPSI 1: "Klaim Bonus Putaran"
             let bonusRowDiv = document.createElement('div');
-            bonusRowDiv.className = "bg-amber-50 border-2 border-amber-400 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
+            bonusRowDiv.className = "bg-amber-50 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
+            bonusRowDiv.style.border = "2px solid #2563eb";
 
             let bonusNameSpan = document.createElement('span');
             bonusNameSpan.className = "font-black text-amber-900 text-xs truncate mr-2 flex items-center space-x-1";
@@ -914,9 +1124,9 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             bonusRowDiv.appendChild(claimBtn);
             container.appendChild(bonusRowDiv);
 
-            // OPSI 2: "Bebas Dari Penjara" (Tema Warna Merah)
             let jailRowDiv = document.createElement('div');
-            jailRowDiv.className = "bg-red-50 border-2 border-red-500 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
+            jailRowDiv.className = "bg-red-50 rounded-xl p-2.5 flex items-center justify-between shadow-sm mb-2";
+            jailRowDiv.style.border = "2px solid #dc2626";
 
             let jailNameSpan = document.createElement('span');
             jailNameSpan.className = "font-black text-red-900 text-xs truncate mr-2 flex items-center space-x-1";
@@ -931,13 +1141,13 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             jailRowDiv.appendChild(jailBtn);
             container.appendChild(jailRowDiv);
 
-            // Daftar aset (Properti Kota, Stasiun, dan Bandara)
             const tradeableTiles = tiles.filter(t => t.type === 'property' || t.type === 'station' || t.type === 'airport');
 
             tradeableTiles.forEach(tile => {
                 let actualIndex = tiles.indexOf(tile);
                 let rowDiv = document.createElement('div');
-                rowDiv.className = "bg-white border-2 border-red-200 rounded-xl p-2.5 flex items-center justify-between shadow-sm";
+                rowDiv.className = "bg-white rounded-xl p-2.5 flex items-center justify-between shadow-sm";
+                rowDiv.style.border = `2px solid ${tile.outlineColor || '#990000'}`;
 
                 let nameSpan = document.createElement('span');
                 nameSpan.className = "font-black text-red-900 text-sm truncate mr-2";
@@ -977,7 +1187,6 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             document.getElementById('transaction-modal').classList.remove('hidden');
         }
 
-        // --- FITUR BEBAS DARI PENJARA ---
         function openJailChoiceModal(playerIdx) {
             closeAllModals();
             currentTransactionPlayer = playerIdx;
@@ -1010,7 +1219,6 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             }
         }
 
-        // --- FITUR KLAIM BONUS PUTARAN & PERSETUJUAN LAWAN ---
         function requestClaimBonus(requesterIdx) {
             closeAllModals();
             let opponentIdx = requesterIdx === 0 ? 1 : 0;
@@ -1233,7 +1441,7 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
 
                 playAudioEffect('sound-transaction');
                 updateUI();
-                showPopup(currentTransactionPlayer, "💸 PAJAK DIBAYAR", `${player.name} membayar pajak sebesar Rp${totalTax.toLocaleString('id-ID')} kepada ${owner.name} untuk ${tile.name}.`, "💸");
+                showPopup(currentTransactionPlayer, "PAJAK DIBAYAR", `${player.name} membayar pajak sebesar Rp${totalTax.toLocaleString('id-ID')} kepada ${owner.name} untuk ${tile.name}.`, "💸");
             } else {
                 showPopup(currentTransactionPlayer, "💀 BANGKRUT / KALAH", `${player.name} tidak memiliki cukup uang untuk membayar pajak sebesar Rp${totalTax.toLocaleString('id-ID')} kepada ${owner.name}! <strong>${player.name} dinyatakan Bangkrut dan Kalah!</strong>`, "💀");
             }
