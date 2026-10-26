@@ -40,8 +40,9 @@
 
         /* Smooth Fade & Rotate Style untuk Elemen Terpisah di Panel Tengah */
         .smooth-fade-element {
-            transition: opacity 0.4s ease-in-out, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform, opacity;
+            --rot: 0deg;
+            transform: rotate(var(--rot));
+            will-change: transform;
         }
 
         /* Kelas Fade Out (Memudar) */
@@ -51,7 +52,18 @@
 
         /* Kelas Rotasi 180 Derajat Menghadap Pemain 2 */
         .element-flipped {
-            transform: rotate(180deg);
+            --rot: 180deg;
+        }
+
+        /* Efek FLIP (menipis lalu membuka lagi), tanpa animasi putaran */
+        @keyframes flipSwap {
+            0%   { transform: rotate(var(--rot)) scaleY(1); }
+            50%  { transform: rotate(var(--rot)) scaleY(0); }
+            100% { transform: rotate(var(--rot)) scaleY(1); }
+        }
+        #game-guide-btn.player-colored:hover { filter: brightness(0.9); }
+        .element-flipping {
+            animation: flipSwap 0.5s ease-in-out;
         }
 
         /* Animasi pop-up tipis kilat */
@@ -315,7 +327,7 @@
         </div>
 
         <!-- PANEL TENGAH (Masing-Masing Elemen Berputar & Memudar Secara Terpisah) -->
-        <div id="middle-panel" class="w-full bg-[#800000] monopoly-border rounded-2xl p-2.5 shadow-md flex items-center justify-between">
+        <div id="middle-panel" class="w-full h-[96px] min-h-[96px] max-h-[96px] shrink-0 bg-[#800000] monopoly-border rounded-2xl p-2.5 shadow-md flex items-center justify-between">
             
             <!-- 1. Tombol Setting -->
             <button id="mid-setting-btn" onclick="openSettingModal()" class="bg-amber-600 text-white font-bold px-3 py-1.5 rounded-xl shadow border border-amber-800 hover:bg-amber-700 transition text-[11px] flex items-center space-x-1 shrink-0 smooth-fade-element">
@@ -323,10 +335,12 @@
             </button>
             
             <!-- 2. Kolom Tampilan Hasil Dadu / Banner -->
-            <div id="banner-box" onclick="triggerDynamicBannerToast()" class="bg-white border-2 border-amber-400 rounded-xl px-2.5 py-1.5 text-center shadow dynamic-banner flex-1 mx-2 overflow-hidden min-h-[50px] flex items-center justify-center smooth-fade-element">
-                <div>
-                    <h2 class="text-xs font-black text-red-900 tracking-wide">MONOPOLI BUCIN</h2>
-                    <p class="text-[9px] font-bold text-amber-700">by Alkasa Craft</p>
+            <div id="banner-box" onclick="triggerDynamicBannerToast()" class="bg-white border-2 border-amber-400 rounded-xl px-2.5 py-1.5 text-center shadow dynamic-banner flex-1 mx-2 overflow-hidden h-[64px] min-h-[64px] max-h-[64px] flex items-center justify-center">
+                <div id="banner-content" class="smooth-fade-element w-full h-full flex items-center justify-center">
+                    <div>
+                        <h2 class="text-xs font-black text-red-900 tracking-wide">MONOPOLI BUCIN</h2>
+                        <p class="text-[9px] font-bold text-amber-700">by Alkasa Craft</p>
+                    </div>
                 </div>
             </div>
 
@@ -750,6 +764,28 @@
             }
         }
 
+        /* Warna tombol Acak Dadu mengikuti warna pemain yang sedang giliran */
+        function updateDiceButtonColor(playerIdx) {
+            const btn = document.getElementById('game-guide-btn');
+            if (!btn) return;
+            const idx = (playerIdx === undefined) ? currentTurnPlayer : playerIdx;
+
+            if (!isDigitalDiceEnabled || !players[idx]) {
+                // Mode Panduan: kembali ke warna bawaan (amber)
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = '';
+                btn.style.boxShadow = '';
+                btn.classList.remove('player-colored');
+                return;
+            }
+
+            const theme = colorThemes[players[idx].colorKey];
+            btn.style.backgroundColor = theme.bg;
+            btn.style.borderColor = theme.border;
+            btn.style.boxShadow = '0 0 0 2px rgba(255,255,255,0.85)';
+            btn.classList.add('player-colored');
+        }
+
         function updateMainActionButtons() {
             let setupBtn = document.getElementById('setup-guide-btn');
             let gameBtn = document.getElementById('game-guide-btn');
@@ -761,34 +797,46 @@
                 if (setupBtn) setupBtn.innerHTML = "📖 Panduan Bermain";
                 if (gameBtn) gameBtn.innerHTML = "<span>📖 Panduan</span>";
             }
+            updateDiceButtonColor();
         }
 
         /* FUNGSI ROTASI MEMUDAR SECARA TERPISAH UNTUK SETIAP ELEMEN PANEL TENGAH */
         function applySmoothFadeRotation(targetPlayerIdx) {
             const elements = [
                 document.getElementById('mid-setting-btn'),
-                document.getElementById('banner-box'),
+                document.getElementById('banner-content'),
                 document.getElementById('game-guide-btn')
             ];
 
-            // 1. Efek Memudar (Fade Out)
-            elements.forEach(el => {
-                if (el) el.classList.add('element-fading');
-            });
+            const shouldBeFlipped = (targetPlayerIdx === 1);
 
-            // 2. Putar Orientasi & Pudar Kembali (Fade In)
-            setTimeout(() => {
-                elements.forEach(el => {
-                    if (el) {
-                        if (targetPlayerIdx === 1) {
-                            el.classList.add('element-flipped');
-                        } else {
-                            el.classList.remove('element-flipped');
-                        }
-                        el.classList.remove('element-fading');
+            // Ganti warna tombol Acak Dadu saat flip berada di titik tengah
+            setTimeout(() => updateDiceButtonColor(targetPlayerIdx), 250);
+
+            elements.forEach(el => {
+                if (!el) return;
+                const isFlipped = el.classList.contains('element-flipped');
+                if (isFlipped === shouldBeFlipped) return; // sudah menghadap pemain yang benar
+
+                // Mulai efek flip (menipis dulu)
+                el.classList.remove('element-flipping');
+                void el.offsetWidth;
+                el.classList.add('element-flipping');
+
+                // Saat paling tipis (tengah animasi), ganti arah hadap secara instan
+                setTimeout(() => {
+                    if (shouldBeFlipped) {
+                        el.classList.add('element-flipped');
+                    } else {
+                        el.classList.remove('element-flipped');
                     }
-                });
-            }, 400);
+                }, 250);
+
+                // Bersihkan class animasi setelah selesai
+                setTimeout(() => {
+                    el.classList.remove('element-flipping');
+                }, 520);
+            });
         }
 
         /* KOCOKAN DADU DENGAN MEMUDAR ROTASI BERGANTIAN SETIAP 3 DETIK */
@@ -798,7 +846,7 @@
 
             playAudioEffect('dice-sound');
 
-            let bannerBox = document.getElementById('banner-box');
+            let bannerBox = document.getElementById('banner-content');
             if (!bannerBox) return;
 
             // Samakan posisi rotasi dengan pemain aktif saat ini sebelum kocok
@@ -943,6 +991,8 @@
                 p2CardBox.style.borderColor = p2Theme.bg;
                 p2CardBox.style.borderWidth = '3px';
             }
+
+            updateDiceButtonColor();
         }
 
         function triggerDynamicBannerToast() {
