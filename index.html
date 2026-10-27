@@ -57,13 +57,13 @@
 
         /* Efek FLIP (menipis lalu membuka lagi), tanpa animasi putaran */
         @keyframes flipSwap {
-            0%   { transform: rotate(var(--rot)) scaleY(1); }
-            50%  { transform: rotate(var(--rot)) scaleY(0); }
-            100% { transform: rotate(var(--rot)) scaleY(1); }
+            0%   { transform: rotate(var(--rot)) scaleY(1); opacity: 1; }
+            50%  { transform: rotate(var(--rot)) scaleY(0); opacity: 0; }
+            100% { transform: rotate(var(--rot)) scaleY(1); opacity: 1; }
         }
         #game-guide-btn.player-colored:hover { filter: brightness(0.9); }
         .element-flipping {
-            animation: flipSwap 0.5s ease-in-out;
+            animation: flipSwap 0.6s ease-in-out;
         }
 
         /* Animasi pop-up tipis kilat */
@@ -433,6 +433,16 @@
         </div>
     </div>
 
+    <!-- MODAL BANK CENTRAL -->
+    <div id="bank-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+        <div id="bank-modal-box" class="bg-white rounded-2xl monopoly-border p-5 max-w-sm w-full text-center shadow-2xl space-y-3 transition-transform duration-300">
+            <div class="text-4xl">🏦</div>
+            <h3 id="bank-modal-title" class="text-xl font-black text-red-900">Bank Central</h3>
+            <div id="bank-modal-message" class="bg-red-50 p-4 rounded-xl text-sm font-medium text-red-900 border border-dashed border-red-300 text-center"></div>
+            <div id="bank-modal-body" class="space-y-2 pt-1"></div>
+        </div>
+    </div>
+
     <!-- MODAL DETAIL AKSI ASET -->
     <div id="asset-action-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div id="asset-action-modal-box" class="bg-white rounded-2xl monopoly-border p-5 max-w-sm w-full text-center shadow-2xl space-y-3 transition-transform duration-300">
@@ -524,7 +534,9 @@
             "Selamat kamu mendapatkan 'Voucher Ngambek Sah' yang bisa digunakan kapan saja.",
             "Selamat kamu berhak mendapatkan satu permintaan kecil yang wajib dituruti [PARTNER] hari ini!",
             "Selamat kamu mendapatkan undian dari bank central sebesar Rp1.000.000",
-            "Selamat kamu bebas pergi ke kota yang kamu mau"
+            "Selamat kamu bebas pergi ke kota yang kamu mau",
+            "Selamat kamu berhak mengubah nama [PARTNER] sesuai yang kamu inginkan.",
+            "Selamat kamu berhak mengubah avatar [PARTNER] sesuai yang kamu inginkan."
         ];
 
         const challengeCards = [
@@ -541,7 +553,13 @@
             "Mundur sebanyak 2 langkah",
             "Maju sebanyak 3 langkah",
             "Kamu harus membayar pajak sebesar Rp500.000",
-            "Kamu harus membayar tagihan listrik sebesar Rp200.000"
+            "Kamu harus membayar tagihan listrik sebesar Rp200.000",
+            "Kamu wajib buat story, seperti story teman mu di Instagram. [PARTNER] berhak memilih secara acak.",
+            "Silahkan kembali ke Start, tanpa klaim bonus putaran.",
+            "Tidak main / lempar dadu sebanyak 2 kali.",
+            "Pergi ke kota Malang.",
+            "Pergi ke kota Pekanbaru.",
+            "Wajib berbicara menggunakan huruf vokal \"U\" selama 1 putaran."
         ];
 
         let usedChanceIndices = [];
@@ -559,8 +577,8 @@
         let currentTurnPlayer = 0; // 0: Pemain 1, 1: Pemain 2
 
         let players = [
-            { id: 0, name: "Pemain 1", money: 10000000, hasCompletedFirstRound: false, colorKey: 'merah', avatar: '💖' },
-            { id: 1, name: "Pemain 2", money: 10000000, hasCompletedFirstRound: false, colorKey: 'biruTua', avatar: '😍' }
+            { id: 0, name: "Pemain 1", money: 10000000, hasCompletedFirstRound: false, skipRolls: 0, loan: 0, colorKey: 'merah', avatar: '💖' },
+            { id: 1, name: "Pemain 2", money: 10000000, hasCompletedFirstRound: false, skipRolls: 0, loan: 0, colorKey: 'biruTua', avatar: '😍' }
         ];
 
         let isSoundMuted = false;
@@ -811,7 +829,7 @@
             const shouldBeFlipped = (targetPlayerIdx === 1);
 
             // Ganti warna tombol Acak Dadu saat flip berada di titik tengah
-            setTimeout(() => updateDiceButtonColor(targetPlayerIdx), 250);
+            setTimeout(() => updateDiceButtonColor(targetPlayerIdx), 300);
 
             elements.forEach(el => {
                 if (!el) return;
@@ -830,12 +848,12 @@
                     } else {
                         el.classList.remove('element-flipped');
                     }
-                }, 250);
+                }, 300);
 
                 // Bersihkan class animasi setelah selesai
                 setTimeout(() => {
                     el.classList.remove('element-flipping');
-                }, 520);
+                }, 620);
             });
         }
 
@@ -843,6 +861,41 @@
         function triggerDigitalDiceRoll() {
             if (isDiceRolling) return;
             isDiceRolling = true;
+
+            // Pemain kena kartu "Tidak main / lempar dadu": giliran dilewati
+            let rollingPlayer = players[currentTurnPlayer];
+            if (rollingPlayer.skipRolls > 0) {
+                let skipBanner = document.getElementById('banner-content');
+                if (!skipBanner) { isDiceRolling = false; return; }
+
+                rollingPlayer.skipRolls--;
+                let sisa = rollingPlayer.skipRolls;
+                applySmoothFadeRotation(currentTurnPlayer);
+
+                skipBanner.innerHTML = `
+                    <div class="flex items-center justify-center space-x-2.5 py-0.5 w-full">
+                        <div class="w-10 h-10 border-2 border-[#800000] rounded-xl flex items-center justify-center text-2xl bg-red-50 shrink-0 shadow-sm">🚫</div>
+                        <div class="text-left">
+                            <p class="text-[11px] font-black text-red-900 leading-tight">Giliran Dilewati</p>
+                            <p class="text-[10px] text-gray-500 font-semibold leading-tight">Tidak boleh lempar dadu${sisa > 0 ? ' (sisa ' + sisa + 'x)' : ''}</p>
+                        </div>
+                    </div>
+                `;
+
+                if (diceRollTimeout) clearTimeout(diceRollTimeout);
+                diceRollTimeout = setTimeout(() => {
+                    skipBanner.innerHTML = `
+                        <div>
+                            <h2 class="text-xs font-black text-red-900 tracking-wide">MONOPOLI BUCIN</h2>
+                            <p class="text-[9px] font-bold text-amber-700">by Alkasa Craft</p>
+                        </div>
+                    `;
+                    currentTurnPlayer = currentTurnPlayer === 0 ? 1 : 0;
+                    applySmoothFadeRotation(currentTurnPlayer);
+                    isDiceRolling = false;
+                }, 3000);
+                return;
+            }
 
             playAudioEffect('dice-sound');
 
@@ -1019,6 +1072,7 @@
             document.getElementById('asset-action-modal').classList.add('hidden');
             document.getElementById('claim-approval-modal').classList.add('hidden');
             document.getElementById('jail-choice-modal').classList.add('hidden');
+            document.getElementById('bank-modal').classList.add('hidden');
             document.getElementById('color-picker-modal').classList.add('hidden');
             document.getElementById('avatar-picker-modal').classList.add('hidden');
             document.getElementById('setting-modal').classList.add('hidden');
@@ -1028,6 +1082,7 @@
             document.getElementById('asset-action-modal-box').classList.remove('flipped-container');
             document.getElementById('claim-approval-box').classList.remove('flipped-container');
             document.getElementById('jail-choice-box').classList.remove('flipped-container');
+            document.getElementById('bank-modal-box').classList.remove('flipped-container');
             document.getElementById('setting-modal-box').classList.remove('flipped-container');
         }
 
@@ -1198,6 +1253,38 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             document.getElementById('card-modal').classList.remove('hidden');
         }
 
+        /* Helper kartu Kesempatan: ubah nama / avatar pemain lawan */
+        const cardAvatarChoices = ['💖', '😍', '🥰', '😘', '💘', '💝', '💗', '💓', '💞', '💕', '💋', '💌', '🌹', '🌷', '🌸', '👑', '🧸', '✨', '😎', '🐱', '🐰', '🦊', '🦄', '🐼'];
+        let pendingCardAvatar = null;
+
+        function selectCardAvatar(emoji) {
+            pendingCardAvatar = emoji;
+            cardAvatarChoices.forEach(e => {
+                let el = document.getElementById(`card-avatar-${e}`);
+                if (!el) return;
+                if (e === emoji) {
+                    el.classList.add('ring-2', 'ring-pink-500', 'bg-pink-100', 'scale-110');
+                } else {
+                    el.classList.remove('ring-2', 'ring-pink-500', 'bg-pink-100', 'scale-110');
+                }
+            });
+        }
+
+        function applyOpponentName(oppIdx, newName) {
+            let cleanName = (newName || '').trim();
+            if (!cleanName) return; // nama kosong diabaikan
+            players[oppIdx].name = cleanName;
+            document.getElementById(oppIdx === 0 ? 'p1-display-name' : 'p2-display-name').innerText = cleanName;
+            updateUI();
+        }
+
+        function applyOpponentAvatar(oppIdx, emoji) {
+            if (!emoji) return;
+            players[oppIdx].avatar = emoji;
+            document.getElementById(oppIdx === 0 ? 'p1-display-avatar' : 'p2-display-avatar').innerText = emoji;
+            updateUI();
+        }
+
         function showCardPopup(playerIdx, title, cardText, icon, cardIndex, cardType) {
             closeAllModals();
             let modalTitleEl = document.getElementById('modal-title');
@@ -1294,6 +1381,76 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
                     }
                 };
                 actionContainer.appendChild(btn);
+            } else if (cardType === 'chance' && cardIndex === 12) {
+                // Ubah nama pemain lawan
+                let oppIdx = playerIdx === 0 ? 1 : 0;
+                contentDiv.insertAdjacentHTML('beforeend', `
+                    <div class="mt-3">
+                        <label class="block text-[11px] font-bold mb-1">Nama baru untuk ${players[oppIdx].name}:</label>
+                        <input id="card-name-input" type="text" maxlength="20" value="${players[oppIdx].name}" class="w-full border-2 border-pink-400 rounded-xl px-3 py-2 text-center font-bold text-pink-900 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    </div>
+                `);
+                let btn = document.createElement('button');
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
+                btn.innerText = "Selesai ✨";
+                btn.onclick = () => {
+                    let input = document.getElementById('card-name-input');
+                    applyOpponentName(oppIdx, input ? input.value : '');
+                    closeAllModals();
+                };
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'chance' && cardIndex === 13) {
+                // Ubah avatar pemain lawan
+                let oppIdx = playerIdx === 0 ? 1 : 0;
+                pendingCardAvatar = players[oppIdx].avatar;
+                let gridHtml = cardAvatarChoices.map(emoji => `<button type="button" id="card-avatar-${emoji}" onclick="selectCardAvatar('${emoji}')" class="text-2xl p-1 rounded-lg transition hover:bg-pink-100">${emoji}</button>`).join('');
+                contentDiv.insertAdjacentHTML('beforeend', `
+                    <div class="mt-3">
+                        <label class="block text-[11px] font-bold mb-1">Pilih avatar baru untuk ${players[oppIdx].name}:</label>
+                        <div class="grid grid-cols-6 gap-1 text-center">${gridHtml}</div>
+                    </div>
+                `);
+                selectCardAvatar(pendingCardAvatar);
+                let btn = document.createElement('button');
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
+                btn.innerText = "Selesai ✨";
+                btn.onclick = () => {
+                    applyOpponentAvatar(oppIdx, pendingCardAvatar);
+                    closeAllModals();
+                };
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'challenge' && cardIndex === 15) {
+                // Kembali ke Start tanpa klaim bonus putaran
+                let btn = document.createElement('button');
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
+                btn.innerText = "Selesai ✨";
+                btn.onclick = () => {
+                    playerPositions[playerIdx] = 0;
+                    closeAllModals();
+                };
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'challenge' && cardIndex === 16) {
+                // Tidak boleh lempar dadu 2 kali
+                let btn = document.createElement('button');
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
+                btn.innerText = "Selesai ✨";
+                btn.onclick = () => {
+                    player.skipRolls = 2;
+                    closeAllModals();
+                };
+                actionContainer.appendChild(btn);
+            } else if (cardType === 'challenge' && (cardIndex === 17 || cardIndex === 18)) {
+                // Pergi ke kota Malang / Pekanbaru
+                let targetCity = cardIndex === 17 ? "Malang" : "Pekanbaru";
+                let btn = document.createElement('button');
+                btn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
+                btn.innerText = "Selesai ✨";
+                btn.onclick = () => {
+                    let targetIdx = tiles.findIndex(t => t.name === targetCity);
+                    if (targetIdx !== -1) playerPositions[playerIdx] = targetIdx;
+                    closeAllModals();
+                };
+                actionContainer.appendChild(btn);
             } else {
                 let defaultBtn = document.createElement('button');
                 defaultBtn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
@@ -1309,6 +1466,205 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             }
 
             document.getElementById('card-modal').classList.remove('hidden');
+        }
+
+        /* ===== BANK CENTRAL: PINJAM & BAYAR PINJAMAN ===== */
+        const bankLoanOptions = [500000, 1000000, 2000000, 3000000];
+        const bankRepayOptions = [100000, 200000, 300000, 500000];
+        let currentBankPlayer = 0;
+
+        function formatRupiah(amount) {
+            return 'Rp' + amount.toLocaleString('id-ID');
+        }
+
+        function openBankModal(playerIdx) {
+            closeAllModals();
+            currentBankPlayer = playerIdx;
+
+            const box = document.getElementById('bank-modal-box');
+            if (playerIdx === 1) {
+                box.classList.add('flipped-container');
+            } else {
+                box.classList.remove('flipped-container');
+            }
+
+            renderBankMenu();
+            document.getElementById('bank-modal').classList.remove('hidden');
+        }
+
+        function bankRemainingLoanHtml() {
+            let loan = players[currentBankPlayer].loan;
+            return loan > 0
+                ? `<div class="mt-2 text-xs font-black text-red-700">Sisa pinjaman: ${formatRupiah(loan)}</div>`
+                : '';
+        }
+
+        function renderBankMenu() {
+            document.getElementById('bank-modal-title').innerText = "Bank Central";
+            document.getElementById('bank-modal-message').innerHTML =
+                `Selamat datang di Bank Central Monopoli Bucin Alkasa Craft, ada yang bisa kami bantu? atau silahkan pilih tombol dibawah ini🙏${bankRemainingLoanHtml()}`;
+
+            const body = document.getElementById('bank-modal-body');
+            body.innerHTML = '';
+
+            let borrowBtn = document.createElement('button');
+            borrowBtn.className = "w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition text-xs";
+            borrowBtn.innerText = "Pinjam ke Bank Central";
+            if (players[currentBankPlayer].loan > 0) {
+                // Masih berhutang: tidak bisa pinjam lagi sebelum lunas
+                borrowBtn.disabled = true;
+                borrowBtn.className += " opacity-40 cursor-not-allowed";
+                borrowBtn.innerText = "Pinjam ke Bank Central (lunasi dulu)";
+            } else {
+                borrowBtn.onclick = renderBankBorrow;
+            }
+
+            let repayBtn = document.createElement('button');
+            repayBtn.className = "w-full bg-[#16a34a] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-green-700 transition text-xs";
+            repayBtn.innerText = "Bayar Pinjaman";
+            repayBtn.onclick = renderBankRepay;
+
+            let backBtn = document.createElement('button');
+            backBtn.className = "w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-xs";
+            backBtn.innerText = "Kembali ke Game";
+            backBtn.onclick = () => closeAllModals();
+
+            body.appendChild(borrowBtn);
+            body.appendChild(repayBtn);
+            body.appendChild(backBtn);
+        }
+
+        function buildBankOptionRow(label, btnText, btnClass, onClick, disabled) {
+            let row = document.createElement('div');
+            row.className = "bg-red-50 rounded-xl p-2.5 flex items-center justify-between shadow-sm";
+            row.style.border = "2px solid #800000";
+
+            let nameSpan = document.createElement('span');
+            nameSpan.className = "font-black text-red-900 text-sm mr-2";
+            nameSpan.innerText = label;
+
+            let btn = document.createElement('button');
+            btn.className = btnClass + " text-white font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0" + (disabled ? " opacity-40 cursor-not-allowed" : "");
+            btn.innerText = btnText;
+            if (disabled) {
+                btn.disabled = true;
+            } else {
+                btn.onclick = onClick;
+            }
+
+            row.appendChild(nameSpan);
+            row.appendChild(btn);
+            return row;
+        }
+
+        function addBankBackButton(body) {
+            let backBtn = document.createElement('button');
+            backBtn.className = "w-full bg-[#800000] text-white font-bold py-2.5 rounded-xl shadow-lg hover:bg-red-900 transition text-xs";
+            backBtn.innerText = "Kembali";
+            backBtn.onclick = renderBankMenu;
+            body.appendChild(backBtn);
+        }
+
+        function renderBankBorrow() {
+            let hasDebt = players[currentBankPlayer].loan > 0;
+            document.getElementById('bank-modal-title').innerText = "Pinjam ke Bank Central";
+            document.getElementById('bank-modal-message').innerHTML = hasDebt
+                ? `Maaf, kamu masih memiliki tagihan pinjaman di Bank Central. Silahkan lunasi dulu sebelum meminjam lagi.${bankRemainingLoanHtml()}`
+                : `Pilih nominal pinjaman yang kamu butuhkan:`;
+
+            const body = document.getElementById('bank-modal-body');
+            body.innerHTML = '';
+            bankLoanOptions.forEach(amount => {
+                body.appendChild(buildBankOptionRow(
+                    formatRupiah(amount), "Pilih", "bg-blue-600 hover:bg-blue-700",
+                    () => borrowFromBank(amount), hasDebt
+                ));
+            });
+            addBankBackButton(body);
+        }
+
+        function renderBankRepay() {
+            let loan = players[currentBankPlayer].loan;
+            document.getElementById('bank-modal-title').innerText = "Bayar Pinjaman";
+            document.getElementById('bank-modal-message').innerHTML = loan > 0
+                ? `Pilih nominal cicilan yang ingin kamu bayar:${bankRemainingLoanHtml()}`
+                : `Kamu tidak memiliki tagihan pinjaman di Bank Central. 🎉`;
+
+            const body = document.getElementById('bank-modal-body');
+            body.innerHTML = '';
+            bankRepayOptions.forEach(amount => {
+                body.appendChild(buildBankOptionRow(
+                    formatRupiah(amount), "Bayar", "bg-[#16a34a] hover:bg-green-700",
+                    () => repayToBank(amount), loan <= 0
+                ));
+            });
+            addBankBackButton(body);
+        }
+
+        function borrowFromBank(amount) {
+            let idx = currentBankPlayer;
+            let player = players[idx];
+
+            // Tidak boleh pinjam lagi selama masih ada hutang
+            if (player.loan > 0) {
+                renderBankBorrow();
+                return;
+            }
+
+            player.money += amount;
+            player.loan += amount;
+            playAudioEffect('sound-transaction');
+            updateUI();
+            showPopup(
+                idx,
+                "PENCAIRAN DANA BERHASIL",
+                `Selamat kamu telah menerima pencairan dana dari pinjaman uang di Bank Central, jangan lupa di bayar yaa😉<br><br>Dana masuk: <strong>${formatRupiah(amount)}</strong><br>Tagihan pinjaman: <strong>${formatRupiah(player.loan)}</strong>`,
+                "🏦"
+            );
+        }
+
+        function repayToBank(amount) {
+            let idx = currentBankPlayer;
+            let player = players[idx];
+
+            if (player.loan <= 0) {
+                renderBankRepay();
+                return;
+            }
+
+            // Jika cicilan melebihi sisa tagihan, bayar sesuai sisa tagihan saja
+            let payAmount = Math.min(amount, player.loan);
+
+            if (player.money < payAmount) {
+                showPopup(
+                    idx,
+                    "SALDO TIDAK CUKUP",
+                    `Saldo ${player.name} tidak cukup untuk membayar cicilan <strong>${formatRupiah(payAmount)}</strong>.<br><br>Sisa tagihan: <strong>${formatRupiah(player.loan)}</strong>`,
+                    "⚠️"
+                );
+                return;
+            }
+
+            player.money -= payAmount;
+            player.loan -= payAmount;
+            playAudioEffect('sound-transaction');
+            updateUI();
+
+            if (player.loan <= 0) {
+                showPopup(
+                    idx,
+                    "PINJAMAN LUNAS",
+                    `Kamu telah membayar <strong>${formatRupiah(payAmount)}</strong> ke Bank Central.<br><br>Sisa tagihan: <strong>Rp0</strong><br>Selamat, pinjamanmu sudah lunas! 🎉`,
+                    "🎉"
+                );
+            } else {
+                showPopup(
+                    idx,
+                    "PEMBAYARAN BERHASIL",
+                    `Kamu telah membayar <strong>${formatRupiah(payAmount)}</strong> ke Bank Central.<br><br>Sisa tagihan yang harus dibayarkan: <strong>${formatRupiah(player.loan)}</strong>`,
+                    "💳"
+                );
+            }
         }
 
         function openTransactionModal(playerIdx) {
@@ -1362,6 +1718,24 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             jailRowDiv.appendChild(jailNameSpan);
             jailRowDiv.appendChild(jailBtn);
             container.appendChild(jailRowDiv);
+
+            // 2b. Bank Central (pinjam & bayar pinjaman)
+            let bankRowDiv = document.createElement('div');
+            bankRowDiv.className = "bg-blue-50 rounded-xl p-2.5 flex items-center justify-between shadow-sm mt-2";
+            bankRowDiv.style.border = "2px solid #800000";
+
+            let bankNameSpan = document.createElement('span');
+            bankNameSpan.className = "font-black text-red-900 text-xs truncate mr-2 flex items-center space-x-1";
+            bankNameSpan.innerHTML = `🏦 Bank Central`;
+
+            let bankBtn = document.createElement('button');
+            bankBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs shadow transition shrink-0";
+            bankBtn.innerText = "Pilih";
+            bankBtn.onclick = () => openBankModal(currentTransactionPlayer);
+
+            bankRowDiv.appendChild(bankNameSpan);
+            bankRowDiv.appendChild(bankBtn);
+            container.appendChild(bankRowDiv);
 
             // 3. GARIS PEMISAH & JARAK LEBAR (~1 CM / mt-6 mb-4)
             let dividerWrapper = document.createElement('div');
