@@ -61,6 +61,20 @@
             50%  { transform: rotate(var(--rot)) scaleY(0); opacity: 0; }
             100% { transform: rotate(var(--rot)) scaleY(1); opacity: 1; }
         }
+        /* Animasi saldo & uang terbang */
+        #p1-money, #p2-money { display: inline-block; transition: transform 0.2s ease, color 0.2s ease; }
+        .money-changing { transform: scale(1.18); }
+        .flying-money {
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 200;
+            font-size: 22px;
+            line-height: 1;
+            pointer-events: none;
+            will-change: transform, opacity;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+        }
         #game-guide-btn.player-colored:hover { filter: brightness(0.9); }
         .element-flipping {
             animation: flipSwap 0.6s ease-in-out;
@@ -554,7 +568,7 @@
             "Maju sebanyak 3 langkah",
             "Kamu harus membayar pajak sebesar Rp500.000",
             "Kamu harus membayar tagihan listrik sebesar Rp200.000",
-            "Kamu wajib buat story, seperti story teman mu di Instagram. [PARTNER] berhak memilih secara acak.",
+            "Buat story seperti story teman mu di Instagram [PARTNER] berhak memilih secara acak.",
             "Silahkan kembali ke Start, tanpa klaim bonus putaran.",
             "Tidak main / lempar dadu sebanyak 2 kali.",
             "Pergi ke kota Malang.",
@@ -1122,9 +1136,132 @@ Kumpulkan aset terbanyak (kota, stasiun, bandara, dan rumah) serta jaga saldo ag
             return baseBuyout + totalHouseValue;
         }
 
+        /* ===== ANIMASI SALDO & UANG TERBANG ===== */
+        let displayedMoney = [null, null];   // angka yang sedang tampil di layar
+        let targetMoney = [null, null];      // angka tujuan animasi
+        let moneyAnimFrames = [null, null];
+
+        function renderMoneyText(i, val) {
+            document.getElementById(i === 0 ? 'p1-money' : 'p2-money').innerText = Math.round(val).toLocaleString('id-ID');
+        }
+
+        function isAnyModalOpen() {
+            return Array.from(document.querySelectorAll('.fixed.inset-0.z-50')).some(el => !el.classList.contains('hidden'));
+        }
+
+        function animateMoneyCounter(i, from, to) {
+            cancelAnimationFrame(moneyAnimFrames[i]);
+            const span = document.getElementById(i === 0 ? 'p1-money' : 'p2-money');
+            const diff = to - from;
+            const duration = Math.min(2200, Math.max(1000, 800 + Math.abs(diff) / 2000));
+            const startTime = performance.now();
+
+            span.style.color = diff > 0 ? '#16a34a' : '#dc2626';
+            span.classList.add('money-changing');
+
+            function step(now) {
+                let t = Math.min(1, (now - startTime) / duration);
+                let eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                displayedMoney[i] = from + diff * eased;
+                renderMoneyText(i, displayedMoney[i]);
+
+                if (t < 1) {
+                    moneyAnimFrames[i] = requestAnimationFrame(step);
+                } else {
+                    displayedMoney[i] = to;
+                    renderMoneyText(i, to);
+                    span.style.color = '';
+                    span.classList.remove('money-changing');
+                }
+            }
+            moneyAnimFrames[i] = requestAnimationFrame(step);
+        }
+
+        function launchMoneyFlight(srcEl, dstEl, amount) {
+            if (!srcEl || !dstEl) return;
+            const s = srcEl.getBoundingClientRect();
+            const d = dstEl.getBoundingClientRect();
+            const sx = s.left + s.width / 2, sy = s.top + s.height / 2;
+            const dx = d.left + d.width / 2, dy = d.top + d.height / 2;
+            const count = Math.min(14, Math.max(6, Math.round(amount / 150000)));
+            const icons = ['💵', '💸', '💰', '🪙'];
+
+            for (let k = 0; k < count; k++) {
+                const el = document.createElement('div');
+                el.className = 'flying-money';
+                el.textContent = icons[Math.floor(Math.random() * icons.length)];
+                document.body.appendChild(el);
+
+                const jx = (Math.random() - 0.5) * Math.min(s.width, 120) * 0.6;
+                const jy = (Math.random() - 0.5) * Math.min(s.height, 60) * 0.6;
+                const ex = (Math.random() - 0.5) * Math.min(d.width, 120) * 0.6;
+                const ey = (Math.random() - 0.5) * Math.min(d.height, 60) * 0.6;
+                const mx = (sx + dx) / 2 + (Math.random() - 0.5) * 90;
+                const my = (sy + dy) / 2 - 30 - Math.random() * 70;
+                const rot = (Math.random() - 0.5) * 120;
+                const at = (x, y, sc, r) => `translate(${x}px, ${y}px) translate(-50%, -50%) scale(${sc}) rotate(${r}deg)`;
+
+                const anim = el.animate([
+                    { transform: at(sx + jx, sy + jy, 0.5, 0), opacity: 0 },
+                    { transform: at(sx + jx + (mx - sx) * 0.15, sy + jy + (my - sy) * 0.15, 1, rot * 0.3), opacity: 1, offset: 0.15 },
+                    { transform: at(mx, my, 1.15, rot * 0.6), opacity: 1, offset: 0.55 },
+                    { transform: at(dx + ex, dy + ey, 0.55, rot), opacity: 0 }
+                ], {
+                    duration: 900 + Math.random() * 400,
+                    delay: k * (900 / count),
+                    easing: 'ease-in-out',
+                    fill: 'both'
+                });
+                anim.onfinish = () => el.remove();
+            }
+        }
+
+        function maybeFlushMoney() {
+            // Inisialisasi awal tanpa animasi
+            if (displayedMoney[0] === null) {
+                for (let i = 0; i < 2; i++) {
+                    displayedMoney[i] = players[i].money;
+                    targetMoney[i] = players[i].money;
+                    renderMoneyText(i, players[i].money);
+                }
+                return;
+            }
+
+            // Tunggu sampai semua pop up ditutup / Selesai
+            if (isAnyModalOpen()) return;
+
+            const delta = [players[0].money - targetMoney[0], players[1].money - targetMoney[1]];
+            if (delta[0] === 0 && delta[1] === 0) return;
+
+            const moneyBoxes = [document.getElementById('p1-money-box'), document.getElementById('p2-money-box')];
+            const bankBox = document.getElementById('banner-box'); // kotak "Monopoli Bucin" = Bank Central
+
+            if ((delta[0] < 0 && delta[1] > 0) || (delta[0] > 0 && delta[1] < 0)) {
+                // Pemain ke pemain
+                const from = delta[0] < 0 ? 0 : 1;
+                const to = from === 0 ? 1 : 0;
+                launchMoneyFlight(moneyBoxes[from], moneyBoxes[to], Math.max(Math.abs(delta[0]), Math.abs(delta[1])));
+            } else {
+                // Pemain ke Bank Central, atau Bank Central ke pemain
+                for (let i = 0; i < 2; i++) {
+                    if (delta[i] < 0) launchMoneyFlight(moneyBoxes[i], bankBox, Math.abs(delta[i]));
+                    else if (delta[i] > 0) launchMoneyFlight(bankBox, moneyBoxes[i], delta[i]);
+                }
+            }
+
+            for (let i = 0; i < 2; i++) {
+                if (delta[i] !== 0) {
+                    const from = displayedMoney[i];
+                    targetMoney[i] = players[i].money;
+                    animateMoneyCounter(i, from, players[i].money);
+                }
+            }
+        }
+
+        setInterval(maybeFlushMoney, 150);
+
         function updateUI() {
-            document.getElementById('p1-money').innerText = players[0].money.toLocaleString('id-ID');
-            document.getElementById('p2-money').innerText = players[1].money.toLocaleString('id-ID');
+            maybeFlushMoney();
 
             renderPlayerProperties(0);
             renderPlayerProperties(1);
